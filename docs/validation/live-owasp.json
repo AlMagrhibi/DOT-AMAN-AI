@@ -1,0 +1,12 @@
+{
+  "source": "OWASP SQL Injection Prevention Cheat Sheet",
+  "url": "https://raw.githubusercontent.com/OWASP/CheatSheetSeries/master/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.md",
+  "license": "CC-BY-SA-4.0",
+  "documents": 1,
+  "chunks": 18,
+  "sha256": "0c00c87970eceb404ec4061a30b0fbe3390d870244f3d0802465e20c39178bbb",
+  "fetched": "2026-10-22T02:42:57Z",
+  "document_bytes": 17871,
+  "sync": "passed",
+  "prepared_statements_search": "passed"
+}

@@ -1,0 +1,23 @@
+{
+  "go": "1.27.3",
+  "platform": "Linux x86_64",
+  "test_passes": 32,
+  "test_failures": 0,
+  "test_skips": 0,
+  "packages_passed": [
+    "github.com/AlMagrhibi/DOT-AMAN-AI/internal/app",
+    "github.com/AlMagrhibi/DOT-AMAN-AI/internal/config",
+    "github.com/AlMagrhibi/DOT-AMAN-AI/internal/contextmanager",
+    "github.com/AlMagrhibi/DOT-AMAN-AI/internal/evaluation",
+    "github.com/AlMagrhibi/DOT-AMAN-AI/internal/knowledge",
+    "github.com/AlMagrhibi/DOT-AMAN-AI/internal/memory",
+    "github.com/AlMagrhibi/DOT-AMAN-AI/internal/model",
+    "github.com/AlMagrhibi/DOT-AMAN-AI/internal/reporting",
+    "github.com/AlMagrhibi/DOT-AMAN-AI/internal/storage",
+    "github.com/AlMagrhibi/DOT-AMAN-AI/internal/tools",
+    "github.com/AlMagrhibi/DOT-AMAN-AI/internal/tui"
+  ],
+  "race": "passed",
+  "real_GGUF": "blocked by model download policy",
+  "govulncheck": "blocked by vuln.go.dev policy"
+}

@@ -1,16 +1,20 @@
 # Project map
 
-| Phase | State | Evidence |
+States describe implemented scope, not an unconditional product acceptance claim. Development is on `main` with continuous confirmed pushes. Real GGUF and vulnerability validation remain externally blocked.
+
+| Phase | State | Evidence / milestone commit |
 |---|---|---|
-| 0 Foundation | Complete | e7fb02a pushed to main; official Go archive digest verified |
-| 1 Go core | Complete | Config validation, SQLite WAL/FTS5, persistence/isolation/edit/delete tests; check.sh and doctor passed |
-| 2 Tools | Complete | Fixed registry, audit fail-closed, process-group cancellation, output caps, root confinement; 4 tests + fuzz seed passed |
-| 3 Provider | Complete | Local-only HTTP, health/model info, chat/complete, schema suggestions, SSE, cancellation/redirect tests |
-| 4 llama.cpp | Partial | Server and bench built from c7fc509; model download blocked by network policy, so real inference/throughput unrun |
-| 5 Knowledge | Partial | FTS5 BM25, Arabic normalization, provenance, versioned document replacement/import/search tested; live feed and evaluation pending |
-| 6 Memory/context | Partial | Reviewed memory correction/deletion/isolation and source-linked summary storage tested; two-level explicit local summarization tested; model quality still pending |
-| 7 Agent | Partial | Analysis/Confirm/Auto orchestration, 4-step/90-second limits, RAG/context integration, restart and real uname tests passed; quality evaluation pending |
-| 8 TUI | Partial | Bubble Tea streaming, sessions/mode/memory/search commands, confirmation, copy mock, Unicode/resize and real PTY passed; Markdown added; real Wayland pending |
-| 9 Reports/Arch | Partial | Markdown/JSON export and read-only Arch diagnostics implemented; Arch target not available in Cloud |
-| 10 Hardening | Partial | Unit/integration/race passed; bounded fuzzing in progress; vulnerability database network access blocked |
-| 11 Handoff | Deferred | Not implemented yet |
+| 0 Foundation | Complete | Specification, architecture, threat model and official Go digest verified; `e7fb02a` |
+| 1 Go core | Complete | Strict config, SQLite/WAL/FTS5, session persistence/isolation/edit/delete and migrations; `96dcb35` |
+| 2 Tool core | Complete | Fixed read-only registry, validator/audit fail-closed, argv separation, process-group cancellation and file confinement; `de97000` |
+| 3 Provider | Complete (contract) | Local HTTP, health/model info, chat/complete, schema suggestions, SSE, cancellation/redirect/proxy tests; `c4598cf`; real model under phase 4 |
+| 4 llama.cpp/model | Partial | Server/bench built at `c7fc509`; real model download denied by network policy; no inference/throughput benchmark |
+| 5 Knowledge | Partial | Live OWASP sync/search, CISA connector, atomic versioned FTS5 search; `a69c4a5`, `ac6f6fa`; 58/60 narrow lexical evaluation at `174f6ff`; CISA live/conditional sync/richer source metadata pending |
+| 6 Memory/context | Partial | Persistent reviewed facts, source-linked two-level explicit summaries, conservative prompt budgets; `174f6ff`; source mutation invalidation tested; real-model long-dialogue accuracy pending |
+| 7 Agent | Partial | Modes, 4-call/90s limits, RAG/context, actual tool observations, experiment success/failure persistence; `ef30006` and hardening follow-up; real model planning quality/recovery pending |
+| 8 TUI | Partial | Bubble Tea, Markdown, stream, sessions, memory, search, confirmation, copy substitute; real PTY + Unicode/resize passed at `ac6f6fa`, `174f6ff`; actual Wayland/target bidi pending |
+| 9 Reports/Arch | Partial | Private Arabic Markdown/JSON evidence exports, read-only systemd/journal/pacman/ip registry; target Arch runtime/privileged repair not validated or implemented |
+| 10 Hardening | Partial | gofmt/vet/build, 32 passing test/subtest/fuzz-seed outcomes with race; no failures/skips; bounded fuzz runs and module integrity passed; vulnerability DB and full real-model quality checks blocked |
+| 11 Handoff | Partial | Local setup, pinned build/start/download scripts, saved install/start draft, continuously pushed source; fresh-clone/archive verification recorded in follow-up; full acceptance requires blockers resolved |
+
+Validation evidence: `docs/validation/quality.json`, `retrieval.json`, `pty-cli.json`, `live-owasp.json`. See KNOWN_ISSUES.md for limitations, BENCHMARKS.md for metrics, and CODEX_IMPLEMENTATION_REPORT.md for delivery status. Nothing labeled Partial should be treated as complete.

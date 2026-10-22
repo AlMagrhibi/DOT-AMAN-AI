@@ -48,10 +48,10 @@ type Spec struct {
 	Parameters  any    `json:"parameters"`
 }
 
-var descriptions = map[string]string{"read_file": "Read UTF-8 file inside configured root", "list_dir": "List directory inside configured root", "system_info": "Kernel and architecture", "go_version": "Installed Go version", "services": "Local systemd service states", "packages": "Arch installed packages", "network": "Local interface addresses"}
+var descriptions = map[string]string{"read_file": "Read UTF-8 file inside configured root", "list_dir": "List directory inside configured root", "system_info": "Kernel and architecture", "go_version": "Installed Go version", "services": "Local systemd service states", "packages": "Arch installed packages", "network": "Local interface addresses", "journal": "Recent local system journal"}
 
 func Specs() []Spec {
-	names := []string{"read_file", "list_dir", "system_info", "go_version", "services", "packages", "network"}
+	names := []string{"read_file", "list_dir", "system_info", "go_version", "services", "packages", "network", "journal"}
 	out := make([]Spec, 0, len(names))
 	for _, n := range names {
 		p := map[string]any{"type": "object", "properties": map[string]any{}, "additionalProperties": false}
@@ -134,7 +134,7 @@ func (e *Engine) Execute(ctx context.Context, session string, c Call) (Result, e
 	if c.Name == "read_file" || c.Name == "list_dir" {
 		r.Output, err = e.files(ctx, c.Name, a)
 	} else {
-		commands := map[string][]string{"system_info": {"uname", "-srmo"}, "go_version": {"go", "version"}, "services": {"systemctl", "list-units", "--type=service", "--no-pager", "--plain"}, "packages": {"pacman", "-Q"}, "network": {"ip", "-brief", "address"}}
+		commands := map[string][]string{"system_info": {"uname", "-srmo"}, "go_version": {"go", "version"}, "services": {"systemctl", "list-units", "--type=service", "--no-pager", "--plain"}, "packages": {"pacman", "-Q"}, "network": {"ip", "-brief", "address"}, "journal": {"journalctl", "--no-pager", "-n", "100", "--output=short"}}
 		v := commands[c.Name]
 		runner := e.Runner
 		if runner == nil {

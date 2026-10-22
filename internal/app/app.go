@@ -4,11 +4,13 @@ package app
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/AlMagrhibi/DOT-AMAN-AI/internal/config"
 	"github.com/AlMagrhibi/DOT-AMAN-AI/internal/contextmanager"
 	"github.com/AlMagrhibi/DOT-AMAN-AI/internal/knowledge"
 	"github.com/AlMagrhibi/DOT-AMAN-AI/internal/memory"
+	"github.com/AlMagrhibi/DOT-AMAN-AI/internal/metrics"
 	"github.com/AlMagrhibi/DOT-AMAN-AI/internal/model"
 	"github.com/AlMagrhibi/DOT-AMAN-AI/internal/storage"
 	"github.com/AlMagrhibi/DOT-AMAN-AI/internal/tools"
@@ -27,12 +29,15 @@ type App struct {
 	Tools     *tools.Engine
 }
 type Outcome struct {
-	Text      string          `json:"text"`
-	Session   string          `json:"session"`
-	Usage     model.Usage     `json:"usage"`
-	Duration  time.Duration   `json:"duration_ns"`
-	Results   []tools.Result  `json:"results"`
-	Citations []knowledge.Hit `json:"citations"`
+	InferenceDuration time.Duration   `json:"inference_duration_ns"`
+	TTFT              time.Duration   `json:"ttft_ns"`
+	Process           metrics.Process `json:"app_metrics"`
+	Text              string          `json:"text"`
+	Session           string          `json:"session"`
+	Usage             model.Usage     `json:"usage"`
+	Duration          time.Duration   `json:"duration_ns"`
+	Results           []tools.Result  `json:"results"`
+	Citations         []knowledge.Hit `json:"citations"`
 }
 
 func Open(c config.Config, p model.Provider) (*App, error) {
@@ -53,9 +58,10 @@ func Open(c config.Config, p model.Provider) (*App, error) {
 	return &App{c, s, k, m, p, &tools.Engine{Root: c.Root, Audit: s}}, nil
 }
 func (a *App) Close() error { return a.Store.Close() }
-func (a *App) Run(ctx context.Context, session, prompt string, approve func(tools.Call) bool, onText func(string) error) (Outcome, error) {
+func (a *App) Run(ctx context.Context, session, prompt string, approve func(tools.Call) bool, onText func(string) error) (out Outcome, retErr error) {
 	start := time.Now()
-	out := Outcome{Session: session}
+	measurement := metrics.Start()
+	out = Outcome{Session: session}
 	if strings.TrimSpace(prompt) == "" || len(prompt) > 65536 {
 		return out, fmt.Errorf("empty or oversized prompt")
 	}
@@ -73,13 +79,31 @@ func (a *App) Run(ctx context.Context, session, prompt string, approve func(tool
 		session = id
 		out.Session = id
 	}
-	original, err := a.Store.Messages(ctx, session)
+	original, err := a.Store.RecentMessages(ctx, session, 64)
 	if err != nil {
 		return out, err
 	}
 	if err = a.Store.Add(ctx, session, "user", prompt); err != nil {
 		return out, err
 	}
+	defer func() {
+		recordCtx, done := context.WithTimeout(context.WithoutCancel(ctx), 3*time.Second)
+		defer done()
+		status := "complete"
+		detail := ""
+		if retErr != nil {
+			status = "failed"
+			detail = retErr.Error()
+		}
+		b, err := json.Marshal(out)
+		if err != nil {
+			retErr = errors.Join(retErr, err)
+			return
+		}
+		if err = a.Store.SaveExperiment(recordCtx, session, prompt, a.Config.Mode, status, string(b), detail); err != nil {
+			retErr = errors.Join(retErr, fmt.Errorf("experiment log: %w", err))
+		}
+	}()
 	hist := []model.Message{}
 	for _, m := range original {
 		hist = append(hist, model.Message{Role: m.Role, Content: m.Content})
@@ -172,6 +196,9 @@ func (a *App) Run(ctx context.Context, session, prompt string, approve func(tool
 	}
 	out.Text = response.Text
 	out.Usage = response.Usage
+	out.InferenceDuration = response.Duration
+	out.TTFT = response.TTFT
+	out.Process = measurement.Finish()
 	out.Duration = time.Since(start)
 	if len(hits) > 0 {
 		out.Text += "\n\nالمراجع المسترجعة (لا تعني التحقق من كل ادعاء):"

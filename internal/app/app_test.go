@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/AlMagrhibi/DOT-AMAN-AI/internal/config"
 	"github.com/AlMagrhibi/DOT-AMAN-AI/internal/model"
 	"github.com/AlMagrhibi/DOT-AMAN-AI/internal/tools"
@@ -49,5 +50,27 @@ func TestWorkflowPersistenceAndModes(t *testing.T) {
 				t.Fatal(msgs, err)
 			}
 		})
+	}
+}
+
+func TestFailedInferenceRecordedAsFailed(t *testing.T) {
+	c, err := config.Default()
+	if err != nil {
+		t.Fatal(err)
+	}
+	c.DataDir = t.TempDir()
+	c.Root = t.TempDir()
+	a, err := Open(c, model.Mock{Err: fmt.Errorf("synthetic inference failure")})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer a.Close()
+	o, err := a.Run(context.Background(), "", "اختبار", nil, nil)
+	if err == nil {
+		t.Fatal("failure hidden")
+	}
+	e, err := a.Store.Experiments(context.Background(), o.Session)
+	if err != nil || len(e) != 1 || e[0].Status != "failed" || e[0].Error == "" {
+		t.Fatal(e, err)
 	}
 }

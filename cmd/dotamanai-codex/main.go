@@ -71,6 +71,12 @@ func run(ctx context.Context, args []string) error {
 			return err
 		}
 		return a.Memory.Compress(ctx, f.Arg(1), messages, p, c.Context)
+	case "experiments":
+		v, err := a.Store.Experiments(ctx, f.Arg(1))
+		if err != nil {
+			return err
+		}
+		return encode(v)
 	case "sessions":
 		v, err := a.Store.Sessions(ctx)
 		if err != nil {

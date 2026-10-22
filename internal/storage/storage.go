@@ -75,6 +75,8 @@ func (s *Store) migrate() error {
 	if _, err = tx.Exec(`CREATE TABLE IF NOT EXISTS sessions(id TEXT PRIMARY KEY,title TEXT NOT NULL,created TEXT NOT NULL);
  CREATE TABLE IF NOT EXISTS messages(id INTEGER PRIMARY KEY,session TEXT NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,role TEXT NOT NULL CHECK(role IN ('user','assistant','system')),content TEXT NOT NULL,created TEXT NOT NULL);
  CREATE INDEX IF NOT EXISTS messages_session ON messages(session,id);
+ CREATE TABLE IF NOT EXISTS summaries(id INTEGER PRIMARY KEY,session TEXT NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,level INTEGER NOT NULL,first_message INTEGER NOT NULL,last_message INTEGER NOT NULL,text TEXT NOT NULL,created TEXT NOT NULL);
+ CREATE TABLE IF NOT EXISTS experiments(id INTEGER PRIMARY KEY,session TEXT NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,prompt TEXT NOT NULL,mode TEXT NOT NULL,status TEXT NOT NULL,report TEXT NOT NULL,error TEXT NOT NULL,created TEXT NOT NULL);
  CREATE TABLE IF NOT EXISTS audit(id INTEGER PRIMARY KEY,session TEXT,tool TEXT,status TEXT,detail TEXT,created TEXT NOT NULL);
  PRAGMA user_version=1;`); err != nil {
 		return err
@@ -131,12 +133,47 @@ func (s *Store) Messages(ctx context.Context, id string) ([]Message, error) {
 	return out, rows.Err()
 }
 func (s *Store) Edit(ctx context.Context, session string, id int64, text string) error {
-	r, err := s.DB.ExecContext(ctx, `UPDATE messages SET content=? WHERE session=? AND id=?`, text, session, id)
-	return changed(r, err)
+	if len(text) > 1<<20 {
+		return fmt.Errorf("message too large")
+	}
+	return s.mutateMessage(ctx, session, id, `UPDATE messages SET content=? WHERE session=? AND id=?`, text, session, id)
 }
 func (s *Store) DeleteMessage(ctx context.Context, session string, id int64) error {
-	r, err := s.DB.ExecContext(ctx, `DELETE FROM messages WHERE session=? AND id=?`, session, id)
-	return changed(r, err)
+	return s.mutateMessage(ctx, session, id, `DELETE FROM messages WHERE session=? AND id=?`, session, id)
+}
+func (s *Store) mutateMessage(ctx context.Context, session string, id int64, query string, args ...any) error {
+	tx, err := s.DB.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+	r, err := tx.ExecContext(ctx, query, args...)
+	if err = changed(r, err); err != nil {
+		return err
+	}
+	if _, err = tx.ExecContext(ctx, `DELETE FROM summaries WHERE session=?`, session); err != nil {
+		return err
+	}
+	return tx.Commit()
+}
+func (s *Store) RecentMessages(ctx context.Context, id string, limit int) ([]Message, error) {
+	if limit < 1 || limit > 256 {
+		return nil, fmt.Errorf("invalid history limit")
+	}
+	rows, err := s.DB.QueryContext(ctx, `SELECT id,session,role,content,created FROM (SELECT id,session,role,content,created FROM messages WHERE session=? ORDER BY id DESC LIMIT ?) ORDER BY id`, id, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	out := []Message{}
+	for rows.Next() {
+		var m Message
+		if err = rows.Scan(&m.ID, &m.Session, &m.Role, &m.Content, &m.Created); err != nil {
+			return nil, err
+		}
+		out = append(out, m)
+	}
+	return out, rows.Err()
 }
 func (s *Store) DeleteSession(ctx context.Context, id string) error {
 	r, err := s.DB.ExecContext(ctx, `DELETE FROM sessions WHERE id=?`, id)
@@ -158,4 +195,36 @@ func changed(r sql.Result, err error) error {
 func (s *Store) Audit(ctx context.Context, session, tool, status, detail string) error {
 	_, err := s.DB.ExecContext(ctx, `INSERT INTO audit(session,tool,status,detail,created) VALUES(?,?,?,?,?)`, session, tool, status, detail, time.Now().UTC().Format(time.RFC3339Nano))
 	return err
+}
+
+type Experiment struct {
+	ID      int64  `json:"id"`
+	Session string `json:"session"`
+	Prompt  string `json:"prompt"`
+	Mode    string `json:"mode"`
+	Status  string `json:"status"`
+	Report  string `json:"report"`
+	Error   string `json:"error"`
+	Created string `json:"created"`
+}
+
+func (s *Store) SaveExperiment(ctx context.Context, session, prompt, mode, status, report, detail string) error {
+	_, err := s.DB.ExecContext(ctx, `INSERT INTO experiments(session,prompt,mode,status,report,error,created) VALUES(?,?,?,?,?,?,?)`, session, prompt, mode, status, report, detail, time.Now().UTC().Format(time.RFC3339Nano))
+	return err
+}
+func (s *Store) Experiments(ctx context.Context, session string) ([]Experiment, error) {
+	rows, err := s.DB.QueryContext(ctx, `SELECT id,session,prompt,mode,status,report,error,created FROM experiments WHERE session=? ORDER BY id DESC LIMIT 20`, session)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	out := []Experiment{}
+	for rows.Next() {
+		var x Experiment
+		if err = rows.Scan(&x.ID, &x.Session, &x.Prompt, &x.Mode, &x.Status, &x.Report, &x.Error, &x.Created); err != nil {
+			return nil, err
+		}
+		out = append(out, x)
+	}
+	return out, rows.Err()
 }

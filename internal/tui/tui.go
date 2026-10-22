@@ -193,14 +193,20 @@ func Stats(o app.Outcome) string {
 	var mem runtime.MemStats
 	runtime.ReadMemStats(&mem)
 	rate := "N/A"
-	if o.Duration > 0 && o.Usage.Output > 0 {
-		rate = fmt.Sprintf("%.1f", float64(o.Usage.Output)/o.Duration.Seconds())
+	if o.InferenceDuration > 0 && o.Usage.Output > 0 {
+		rate = fmt.Sprintf("%.1f", float64(o.Usage.Output)/o.InferenceDuration.Seconds())
 	}
 	tokens := "N/A"
 	if o.Usage.Output > 0 {
 		tokens = strconv.Itoa(o.Usage.Output)
 	}
-	return fmt.Sprintf("Last response · %s tokens · %s tok/s · %.2fs\nApp Go heap %.1f MiB · CPU N/A · GPU N/A · /copy", tokens, rate, o.Duration.Seconds(), float64(mem.Alloc)/(1<<20))
+	cpu := "N/A"
+	rss := "N/A"
+	if o.Process.Available {
+		cpu = fmt.Sprintf("%.1f%%", o.Process.CPUPercent)
+		rss = fmt.Sprintf("%.1f MiB", float64(o.Process.PeakRSSBytes)/(1<<20))
+	}
+	return fmt.Sprintf("Last response · %s tokens · %s tok/s · %.2fs\nApp CPU %s · peak RSS %s · Go heap %.1f MiB · GPU N/A · /copy", tokens, rate, o.Duration.Seconds(), cpu, rss, float64(mem.Alloc)/(1<<20))
 }
 func (m Model) View() string {
 	return lipgloss.NewStyle().Bold(true).Render("Dot Aman AI · "+m.App.Config.Mode) + "\n" + m.view.View() + "\n" + m.input.View() + "\n" + ansi.Strip(m.status) + "\n"
@@ -230,7 +236,7 @@ func (m *Model) command(text string) tea.Cmd {
 	}
 	switch name {
 	case "/help":
-		m.append("\n/help /new /sessions /resume ID /delete-session ID /mode analysis|confirm|auto\n/search WORDS /import PATH /sources /remember TEXT /facts /forget ID\n/correct ID TEXT /export /stats /copy · PgUp/PgDown scroll\n")
+		m.append("\n/help /new /sessions /resume ID /delete-session ID /mode analysis|confirm|auto\n/search WORDS /import PATH /sources /remember TEXT /facts /forget ID\n/correct ID TEXT /experiments /export /stats /copy · PgUp/PgDown scroll\n")
 	case "/new":
 		m.session = ""
 		m.transcript = ""
@@ -294,6 +300,9 @@ func (m *Model) command(text string) tea.Cmd {
 		}
 		id, e := m.App.Memory.Put(ctx, memory.Item{Session: m.session, Kind: "project", Text: arg, Source: "explicit user command", Reviewed: true})
 		show(id, e)
+	case "/experiments":
+		x, e := m.App.Store.Experiments(ctx, m.session)
+		show(x, e)
 	case "/facts":
 		x, e := m.App.Memory.Recall(ctx, m.session, "")
 		show(x, e)

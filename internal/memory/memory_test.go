@@ -114,3 +114,47 @@ func TestHierarchicalSummariesKeepOriginals(t *testing.T) {
 		t.Fatal(len(original), err)
 	}
 }
+
+func TestMessageMutationInvalidatesSummary(t *testing.T) {
+	ctx := context.Background()
+	s, err := storage.Open(t.TempDir())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer s.Close()
+	id, err := s.NewSession(ctx, "private")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = s.Add(ctx, id, "user", "old decision"); err != nil {
+		t.Fatal(err)
+	}
+	msgs, err := s.Messages(ctx, id)
+	if err != nil {
+		t.Fatal(err)
+	}
+	m, err := New(s.DB)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = m.Summary(ctx, id, 1, msgs[0].ID, msgs[0].ID, "old decision"); err != nil {
+		t.Fatal(err)
+	}
+	if err = s.Edit(ctx, id, msgs[0].ID, "correct decision"); err != nil {
+		t.Fatal(err)
+	}
+	text, err := m.SummaryContext(ctx, id)
+	if err != nil || text != "" {
+		t.Fatal("stale summary after correction", text, err)
+	}
+	if err = m.Summary(ctx, id, 1, msgs[0].ID, msgs[0].ID, "correct decision"); err != nil {
+		t.Fatal(err)
+	}
+	if err = s.DeleteMessage(ctx, id, msgs[0].ID); err != nil {
+		t.Fatal(err)
+	}
+	text, err = m.SummaryContext(ctx, id)
+	if err != nil || text != "" {
+		t.Fatal("deleted data survived in summary", text, err)
+	}
+}
