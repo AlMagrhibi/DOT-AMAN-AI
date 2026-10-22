@@ -11,3 +11,7 @@ TUI direct dependencies (full resolved versions in go.mod/go.sum): Bubble Tea v1
 Cloud-only build helpers: CMake 3.31.6 (BSD-3-Clause), Ninja 1.11.1.4 distribution / Ninja (Apache-2.0), installed from PyPI over verified HTTPS. Python is not a delivered application runtime dependency. llama.cpp is pinned to `c7fc5094179bf8a9c73c18593db714f8da41a402`, MIT, cloned through existing GitHub proxy authentication. GCC 14.2.0 builds C/C++ dependencies.
 
 Go module integrity verified by `go mod verify`. govulncheck v1.1.4 (BSD-3-Clause) is installed for development; live vulnerability DB access is blocked, so no clean vulnerability audit is claimed. Original upstream licenses remain applicable. This public repository does not yet specify a license for the new application code; public visibility alone does not grant a license.
+
+## Security update (resumed Cloud evaluation)
+
+govulncheck v1.9.0 supports Go 1.27; v1.1.4 crashed in its old SSA builder. Updated x/text to v0.39.0 (GO-2026-5970), Goldmark to v1.7.17 (GO-2026-5320), and x/net to v0.38.0 (GO-2025-3595). Subsequent source scan found zero reachable vulnerabilities; 10 module-level findings remain not reachable according to this scan and are being reviewed. Full result: docs/validation/govulncheck.txt.

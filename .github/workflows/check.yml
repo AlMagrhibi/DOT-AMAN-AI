@@ -15,5 +15,5 @@ jobs:
       - run: go test -race -tags sqlite_fts5 -count=1 ./...
       - run: go build -tags sqlite_fts5 -trimpath -o bin/dotamanai-codex ./cmd/dotamanai-codex
       - run: python3 tests/pty_smoke.py
-      - run: go install golang.org/x/vuln/cmd/govulncheck@v1.1.4
+      - run: go install golang.org/x/vuln/cmd/govulncheck@v1.9.0
       - run: govulncheck -tags sqlite_fts5 ./...

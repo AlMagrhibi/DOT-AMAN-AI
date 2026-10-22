@@ -18,3 +18,9 @@ States describe implemented scope, not an unconditional product acceptance claim
 | 11 Handoff | Partial | Local setup, pinned build/start/download scripts, saved install/start draft, continuously pushed source; fresh-clone build/tests/PTY and identical binaries verified at `5afeaf0`; source archive provided in chat; full acceptance requires blockers resolved |
 
 Validation evidence: `docs/validation/quality.json`, `retrieval.json`, `pty-cli.json`, `live-owasp.json`. See KNOWN_ISSUES.md for limitations, BENCHMARKS.md for metrics, and CODEX_IMPLEMENTATION_REPORT.md for delivery status. Nothing labeled Partial should be treated as complete.
+
+## Resumed evaluation
+
+- Continued from b54277e without replacing completed components.
+- Official Qwen0.6B Q8_0 metadata and Apache-2.0 license reviewed; pinned revision/digest in configs/model-lock.json. CDN redirect us.aws.cdn.hf.co still denied; exact domain added to draft. No weights or real-inference success claimed.
+- govulncheck v1.9.0 source scan completed after three dependency fixes: 0 reachable vulnerabilities; non-reachable findings under review. Formatting/vet/unit/build passed after changes.
