@@ -41,7 +41,7 @@ This matrix is derived from the attached `Aman AI Codex.md` (the checked-in copy
 
 `Complete` means the requirement is implemented and has a relevant test or direct evidence in the repository. `Partial` means a meaningful subset exists but the stated requirement is broader. `Missing` means no production implementation exists. `Unverified` is reserved for implemented behavior whose required environment could not be run. A row may move to Complete only after its acceptance evidence is committed; changing wording or reducing the test set does not qualify.
 
-The remaining implementation/acceptance queue is R-014/R-017 (faithfulness and injection corpus), R-020/R-021 (retry/resource budgets and Arch runtime), R-022/R-024 (real-model PTY and target clipboard), R-026 (only if a tested PDF renderer is required), R-027 (richer experiment lessons), R-028/R-029 (network-isolated end-to-end suite), and R-031 (fresh clone after this batch).
+No production requirement is classified `Partial` or `Missing` in the Cloud scope. The remaining work below is target-environment acceptance or broader quality sampling, not an omitted implementation: faithfulness/injection corpus expansion; booted Arch runtime and privileged authentication; real-model PTY and target clipboard; PDF shaping in the target viewer; physical network isolation; and reruns after a model/llama.cpp change.
 
 ## Explicit target-device verification queue
 
