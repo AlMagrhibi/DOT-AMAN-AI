@@ -24,3 +24,5 @@ Validation evidence: `docs/validation/quality.json`, `retrieval.json`, `pty-cli.
 - Continued from b54277e without replacing completed components.
 - Official Qwen0.6B Q8_0 metadata and Apache-2.0 license reviewed; pinned revision/digest in configs/model-lock.json. CDN redirect us.aws.cdn.hf.co still denied; exact domain added to draft. No weights or real-inference success claimed.
 - govulncheck v1.9.0 source scan completed after three dependency fixes: 0 reachable vulnerabilities; non-reachable findings under review. Formatting/vet/unit/build passed after changes.
+
+Dependency follow-up: all reported module/package findings remediated via x/net v0.60.0 and its compatible minimum dependencies. govulncheck -show verbose now reports No vulnerabilities found.

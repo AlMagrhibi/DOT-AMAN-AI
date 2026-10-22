@@ -15,3 +15,5 @@ Go module integrity verified by `go mod verify`. govulncheck v1.1.4 (BSD-3-Claus
 ## Security update (resumed Cloud evaluation)
 
 govulncheck v1.9.0 supports Go 1.27; v1.1.4 crashed in its old SSA builder. Updated x/text to v0.39.0 (GO-2026-5970), Goldmark to v1.7.17 (GO-2026-5320), and x/net to v0.38.0 (GO-2025-3595). Subsequent source scan found zero reachable vulnerabilities; 10 module-level findings remain not reachable according to this scan and are being reviewed. Full result: docs/validation/govulncheck.txt.
+
+Follow-up: x/net v0.60.0 selected compatible x/text v0.42.0, x/sys v0.48.0 and x/term v0.46.0. Detailed govulncheck v1.9.0 scan now reports **No vulnerabilities found**, including module/package findings. Scanner database is dated 2026-10-21; results are a point-in-time check, not a guarantee about unknown vulnerabilities.
