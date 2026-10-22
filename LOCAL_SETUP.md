@@ -82,4 +82,16 @@ TUI: `/help`, `/new`, `/sessions`, `/resume ID`, `/delete-session ID`, `/mode an
 3. Test KDE Wayland copy, mixed Arabic/code rendering, resize, long sessions and confirm/deny.
 4. Verify pacman, systemctl, journalctl and ip diagnostics on Arch; Cloud is Debian without a running systemd manager.
 5. Disconnect external networking while retaining loopback: chat, stored search, sessions, tools and report exports must work. Do not invoke manual sync while offline.
-6. Inspect `KNOWN_ISSUES.md`; complete real-model and vulnerability checks before relying on the release.
+6. Inspect `KNOWN_ISSUES.md`; complete real-model checks and rerun the current vulnerability scanner before relying on the release.
+
+## Reproduce the real Cloud evaluation
+
+Development-only, after obtaining the exact official model in `configs/model-lock.json` and enabling its download CDN. `govulncheck v1.9.0` is the supported scanner for the pinned Go toolchain.
+
+```sh
+export LLAMA_SERVER=/workspace/llama.cpp/build/bin/llama-server
+export MODEL_PATH=/workspace/models/Qwen3-0.6B-Q8_0.gguf
+python3 tests/run_real_model.py --runs 3 --output docs/validation/real-model.json
+```
+
+The wrapper verifies the full model digest/size, refuses an occupied port, starts/stops only its own server, runs actual Go provider/app evaluation and preserves failed outcomes. Reports contain only synthetic test data. The official small model is a Cloud smoke target, not evidence of Qwen1.7B quality or target-device performance. This command is **not yet real-model verified** while CDN access is denied. The standalone `go run -tags sqlite_fts5 ./cmd/dotaman-eval` can target a separately started numeric-loopback server; it has no mock fallback.

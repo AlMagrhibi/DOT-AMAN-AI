@@ -1,3 +1,5 @@
+> Resumed status: Go dependency vulnerability scan now completed cleanly with govulncheck v1.9.0; natural-question retrieval fixed and unchanged fixture recall now 60/60. Official model metadata/license reviewed and locked. Weight transfer is still blocked by the newly observed us.aws.cdn.hf.co redirect; no real-GGUF results are claimed. Prepared evaluator and server-resource runner are ready for that prerequisite.
+
 # Codex Cloud implementation report
 
 Repository: https://github.com/AlMagrhibi/DOT-AMAN-AI, branch `main`. **Partial delivery; complete real-model acceptance is blocked.** Source and tested milestones have been pushed throughout development. Exact milestone SHAs and statuses are in PROJECT_MAP.md; final delivery SHA is reported in chat to avoid a self-referential commit hash.

@@ -24,3 +24,11 @@ Cloud functional checks use real SQLite/WAL/FTS5 and real local processes. Offli
 ## Fresh-clone and reproducible build
 
 Verified pushed revision `5afeaf0a62daa173d6695b4c453c276622ec8787` from a fresh HTTPS clone in a second directory: formatting, vet, tests/build, CLI/PTY fixture and module verification passed; no checkout changes. Two builds with `-tags sqlite_fts5 -trimpath -buildvcs=false` produced identical SHA-256 `b6fa00ffade9f5acf8beee3662307b646da6baf54579e006d4fba7d51ea1f91d` using the same Cloud toolchain, architecture and module cache. This does not establish bit-identical output across different C toolchains or architectures. Details: [reproducibility evidence](docs/validation/reproducibility.json).
+
+## Resumed Cloud evaluation
+
+Continuing from b54277e, with no reinitialization. Current detailed govulncheck v1.9.0 scan is clean after updating vulnerable dependencies; the earlier scanner crash and findings were not counted as passes. Latest full output is docs/validation/govulncheck.txt.
+
+A failing regression proved that requiring every word of a natural-language question could hide a matching reference. Search now retains exact matching first and falls back to ranked lexical content words. **Same 20 documents and same 60 queries**, unchanged expected labels: Recall@5 **60/60 (1.0)**, fixed-denominator Precision@5 **0.2**, citation provenance **1.0**. See docs/validation/retrieval-resumed.json. This remains a small lexical fixture benchmark, not real model answer quality.
+
+New evaluator (`cmd/dotaman-eval`, `tests/run_real_model.py`) is prepared for repeated real Arabic/English SSE, schema validity/selection, cancellation, RAG answer evidence, session restart, reviewed-memory recall and actual agent diagnostics. It records per-request latency/TTFT/usage, nearest-rank p50/p95 and output tokens per end-to-end second. Wrapper samples server CPU/RSS every 100 ms and verifies GGUF against publisher digest before launch. **These real-model measurements have not executed**: the newly observed download CDN remains denied. An absent real server correctly fails the evaluator without writing a success report. Resource-counter parsing was checked on a real local process; this is not an inference benchmark.

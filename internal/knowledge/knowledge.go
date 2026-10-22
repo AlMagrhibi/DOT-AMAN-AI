@@ -153,6 +153,28 @@ func (i *Index) Search(ctx context.Context, query string, limit int) ([]Hit, err
 		words[n] = "\"" + w + "\""
 	}
 	q := strings.Join(words, " AND ")
+	hits, err := i.search(ctx, q, limit)
+	if err != nil || len(hits) > 0 || len(words) < 2 {
+		return hits, err
+	}
+	// Preserve exact multi-term matches first. Natural questions often include
+	// function words absent from the document; fall back to ranked lexical terms.
+	stop := map[string]bool{}
+	for _, w := range strings.Fields("what which how does do is are the a an of to in on for or and explain please ما ماذا كيف هل هو هي في من علي عن الى لي اشرح") {
+		stop[w] = true
+	}
+	terms := []string{}
+	for _, w := range words {
+		if !stop[strings.Trim(w, "\"")] {
+			terms = append(terms, w)
+		}
+	}
+	if len(terms) == 0 {
+		return []Hit{}, nil
+	}
+	return i.search(ctx, strings.Join(terms, " OR "), limit)
+}
+func (i *Index) search(ctx context.Context, q string, limit int) ([]Hit, error) {
 	rows, err := i.DB.QueryContext(ctx, `SELECT d.id,d.source,d.url,d.title,c.text,d.sha,d.fetched FROM chunks_fts f JOIN chunks c ON c.id=f.chunk JOIN documents d ON d.id=c.document WHERE chunks_fts MATCH ? ORDER BY bm25(chunks_fts) LIMIT ?`, q, limit)
 	if err != nil {
 		return nil, err

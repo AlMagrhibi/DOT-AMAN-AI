@@ -13,3 +13,5 @@
 /dist/
 core
 core.*
+
+__pycache__/

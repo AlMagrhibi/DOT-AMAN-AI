@@ -1,0 +1,23 @@
+{
+  "continued_from": "b54277e5fe7364481b241c09a28ad94bca511968",
+  "checks": {
+    "format_vet_unit_build": "passed",
+    "race": "passed",
+    "PTY_CLI_HTTP_fixture": "passed",
+    "new_natural_question_regression": "failed_before_fix_passed_after",
+    "govulncheck_v1_9_0": "No vulnerabilities found",
+    "normalization_fuzz": {
+      "executions": 74362,
+      "result": "passed"
+    },
+    "resource_counter_parser": "passed on real local process",
+    "evaluator_missing_server": "correctly fails without success report"
+  },
+  "real_GGUF": {
+    "status": "unrun",
+    "reason": "official transfer redirects to us.aws.cdn.hf.co; proxy CONNECT 403; exact host saved to draft",
+    "metadata_license": "reviewed; configs/model-lock.json",
+    "weights_verified": false
+  },
+  "real_model_benchmarks": "unrun; no latency/throughput/RSS results invented"
+}

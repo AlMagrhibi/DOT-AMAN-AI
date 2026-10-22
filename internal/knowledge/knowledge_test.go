@@ -55,3 +55,23 @@ func FuzzNormalize(f *testing.F) {
 	f.Add("أَمَان AI")
 	f.Fuzz(func(t *testing.T, s string) { _ = Normalize(s) })
 }
+
+func TestNaturalQuestionRetrieval(t *testing.T) {
+	ctx := context.Background()
+	s, err := storage.Open(t.TempDir())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer s.Close()
+	k, err := New(s.DB)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = k.Put(ctx, Document{ID: "port", Source: "fixture", URL: "fixture:port", Title: "KEYSTONE", Text: "The KEYSTONE service listens on port 43871."}); err != nil {
+		t.Fatal(err)
+	}
+	hits, err := k.Search(ctx, "What port does KEYSTONE use?", 5)
+	if err != nil || len(hits) == 0 {
+		t.Fatalf("natural question lost matching reference: %v %v", hits, err)
+	}
+}
