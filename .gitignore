@@ -1,0 +1,15 @@
+.env
+.env.*
+*.pem
+*.key
+*.gguf
+*.db*
+*.sqlite*
+*.log
+/cache/
+/data/
+/models/
+/bin/
+/dist/
+core
+core.*
