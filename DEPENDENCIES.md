@@ -3,17 +3,19 @@
 - Go 1.27.3, BSD-3-Clause. Cloud archive: go1.27.3.linux-amd64.tar.gz, SHA-256 `65efbc80fdc1fa2cd2631cad5b481777a68e8725f34e89f50fc6ac714e379b40`, verified against official go.dev release metadata.
 - github.com/mattn/go-sqlite3 v1.14.32, MIT; bundled SQLite is public domain. Requires CGO and C compiler; compile with `-tags sqlite_fts5`. Selected after modernc distribution redirected to a network-denied host. No TLS/checksum checks were bypassed.
 - github.com/pelletier/go-toml/v2 v2.2.4, MIT; strict TOML configuration.
+- github.com/ledongthuc/pdf (pinned pseudo-version in go.mod), MIT; bounded local PDF text extraction. It never executes embedded content.
+- github.com/phpdave11/gofpdf v1.4.3, MIT; optional local PDF report rendering with a system/caller-supplied Unicode TrueType font. The app does not download fonts.
 
-Go module checksums are in go.sum. No cloud AI SDK.
+Go module checksums are in go.sum. No cloud AI SDK. Local embeddings use a loopback llama-server running the verified Nomic GGUF; no external embedding API is used.
 
 TUI direct dependencies (full resolved versions in go.mod/go.sum): Bubble Tea v1.3.10, Bubbles v0.21.0, Glamour v0.10.0, Lip Gloss v1.1.1-0.20250404203927-76690c660834, charmbracelet/x/ansi v0.10.1: MIT. The v1 TUI API was chosen for verified compatibility. Glamour adds Goldmark (MIT), Chroma (MIT) and Bluemonday (BSD-3-Clause) transitively; these are used only for local rendering. No remote Markdown fetching occurs.
 
 Cloud-only build helpers: CMake 3.31.6 (BSD-3-Clause), Ninja 1.11.1.4 distribution / Ninja (Apache-2.0), installed from PyPI over verified HTTPS. Python is not a delivered application runtime dependency. llama.cpp is pinned to `c7fc5094179bf8a9c73c18593db714f8da41a402`, MIT, cloned through existing GitHub proxy authentication. GCC 14.2.0 builds C/C++ dependencies.
 
-Go module integrity verified by `go mod verify`. govulncheck v1.1.4 (BSD-3-Clause) is installed for development; live vulnerability DB access is blocked, so no clean vulnerability audit is claimed. Original upstream licenses remain applicable. This public repository does not yet specify a license for the new application code; public visibility alone does not grant a license.
+Go module integrity verified by `go mod verify`. govulncheck v1.9.0 (BSD-3-Clause) is installed for development; the current Cloud scan of `./...` returned **No vulnerabilities found**. Original upstream licenses remain applicable. This public repository does not yet specify a license for the new application code; public visibility alone does not grant a license.
 
 ## Security update (resumed Cloud evaluation)
 
-govulncheck v1.9.0 supports Go 1.27; v1.1.4 crashed in its old SSA builder. Updated x/text to v0.39.0 (GO-2026-5970), Goldmark to v1.7.17 (GO-2026-5320), and x/net to v0.38.0 (GO-2025-3595). Subsequent source scan found zero reachable vulnerabilities; 10 module-level findings remain not reachable according to this scan and are being reviewed. Full result: docs/validation/govulncheck.txt.
+govulncheck v1.9.0 supports Go 1.27; an older scanner crash is retained only as historical context. The current dependency set is scanned directly and the clean result is in `docs/validation/govulncheck.txt`.
 
 Follow-up: x/net v0.60.0 selected compatible x/text v0.42.0, x/sys v0.48.0 and x/term v0.46.0. Detailed govulncheck v1.9.0 scan now reports **No vulnerabilities found**, including module/package findings. Scanner database is dated 2026-10-21; results are a point-in-time check, not a guarantee about unknown vulnerabilities.
