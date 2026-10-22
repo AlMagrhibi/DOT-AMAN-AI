@@ -2,7 +2,7 @@
 
 المستودع: https://github.com/AlMagrhibi/DOT-AMAN-AI
 الفرع: `main`
-آخر Commit موثق وقت التحقق البرمجي: `b61936a86c77b6e98c6e66f10da1a1adfb74b3cf`.
+آخر Commit موثق وقت التحقق البرمجي: `27c0c0a70fb9f6730f767d475b7e6fad4c95435d`.
 
 التنفيذ والاختبارات تمت داخل Cloud. الأوزان GGUF وقواعد البيانات والسجلات لا تدخل Git. كل أرقام الأداء أدناه تخص Cloud ولا تمثل جهاز CachyOS/i5-1145G7.
 
@@ -28,7 +28,7 @@
 - CISA الحقيقي: 1,754 سجلًا، CVE search، ثم طلب مشروط `not-modified` مع last-good: `docs/validation/cisa-real-sourceregistry.json`.
 - Arch container: توفر pacman/systemd/journalctl/ip/ps/df فقط؛ لم تُشغّل systemd PID1 أو صلاحيات privileged: `docs/validation/arch-container.json`.
 - Offline: `strace` أثناء CLI مع proxies خارجية معطلة؛ 23 اتصالًا و0 non-loopback IPv4: `docs/validation/offline-contract.json`.
-- Fresh clone من `b61936a` و`go mod verify` و`check.sh` وbuild وPTY موثقة في `docs/validation/clean-clone-4ce71ee.json`.
+- Fresh clone من `27c0c0a` و`go mod verify` و`check.sh` وbuild وPTY/CLI (بما فيه edit/delete) موثقة في `docs/validation/clean-clone-final.json`.
 
 ## بوابات الجودة
 

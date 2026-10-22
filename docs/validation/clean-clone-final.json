@@ -1,0 +1,18 @@
+{
+  "clone_commit": "27c0c0a70fb9f6730f767d475b7e6fad4c95435d",
+  "date_utc": "2026-10-22T10:45:53.155280+00:00",
+  "go_mod_verify": "passed",
+  "scripts_check": "passed",
+  "tagged_build": "passed",
+  "pty": {
+    "fixture": "local HTTP, not real model",
+    "cli_chat": "passed",
+    "session_restart_export": "passed",
+    "message_edit_delete": "passed",
+    "offline_import_arabic_search": "passed",
+    "pty_arabic_stream_resize_default": "passed",
+    "pty_stats_quit": "passed",
+    "real_wayland_clipboard": "unrun"
+  },
+  "workspace": "fresh HTTPS clone from origin/main"
+}
