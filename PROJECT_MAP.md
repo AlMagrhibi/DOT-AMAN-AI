@@ -33,3 +33,7 @@ Dependency follow-up: all reported module/package findings remediated via x/net 
 - `dotaman-eval` compiles; refuses missing/fixture servers. Resource runner verifies official locked GGUF before starting a private loopback server, samples server resources, preserves evaluator exit code and stops only its own server. Real execution pending CDN access.
 - After dependency/search changes: format/vet/unit/build, Race and PTY/CLI fixture checks passed. These are not substituted for real model acceptance.
 - Remaining prerequisite: review/save/publish added `us.aws.cdn.hf.co` domain, then retry digest-verified download and run the prepared evaluator. Current deliverable remains partial.
+
+## GGUF access resolved
+
+Official Qwen3-0.6B Q8_0 downloaded and verified against pinned publisher size/SHA-256 and license digest. Weights remain outside the checkout. Evidence: docs/validation/model-verification.json. Real llama-server evaluation is now being executed; results are recorded separately and no pass is assumed.
