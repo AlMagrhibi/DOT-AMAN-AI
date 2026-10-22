@@ -1,0 +1,7 @@
+{
+  "scope": "local app with unusable external proxies",
+  "chat": "offline local response",
+  "connects": 23,
+  "remote_ipv4_connects": [],
+  "passed": true
+}

@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"database/sql"
 	"os"
 	"path/filepath"
 	"testing"
@@ -63,6 +64,38 @@ func TestPersistenceIsolationEditDelete(t *testing.T) {
 	info, err := os.Stat(filepath.Join(dir, "aman.sqlite"))
 	if err != nil || info.Mode().Perm() != 0600 {
 		t.Fatal(info, err)
+	}
+}
+
+func TestExperimentMetadataMigration(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "aman.sqlite")
+	db, err := sql.Open("sqlite3", path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err = db.Exec(`CREATE TABLE experiments(id INTEGER PRIMARY KEY,session TEXT NOT NULL,prompt TEXT NOT NULL,mode TEXT NOT NULL,status TEXT NOT NULL,report TEXT NOT NULL,error TEXT NOT NULL,created TEXT NOT NULL); PRAGMA user_version=1;`); err != nil {
+		db.Close()
+		t.Fatal(err)
+	}
+	if err = db.Close(); err != nil {
+		t.Fatal(err)
+	}
+	s, err := Open(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer s.Close()
+	id, err := s.NewSession(context.Background(), "migration")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = s.SaveExperimentDetail(context.Background(), id, "prompt", "analysis", "complete", "{}", "", "plan", 2, true, "lesson"); err != nil {
+		t.Fatal(err)
+	}
+	experiments, err := s.Experiments(context.Background(), id)
+	if err != nil || len(experiments) != 1 || experiments[0].Attempts != 2 || !experiments[0].Validated || experiments[0].Lessons != "lesson" {
+		t.Fatalf("migration metadata missing: %+v err=%v", experiments, err)
 	}
 }
 func TestFTS5(t *testing.T) {

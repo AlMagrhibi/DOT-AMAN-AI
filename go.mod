@@ -11,6 +11,7 @@ require (
 	github.com/ledongthuc/pdf v0.0.0-20261020125853-5e46805f718e
 	github.com/mattn/go-sqlite3 v1.14.32
 	github.com/pelletier/go-toml/v2 v2.2.4
+	github.com/phpdave11/gofpdf v1.4.3
 )
 
 require (

@@ -2,6 +2,7 @@ package reporting
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/AlMagrhibi/DOT-AMAN-AI/internal/app"
 	"os"
@@ -169,6 +170,11 @@ func Export(dir string, o app.Outcome) (string, error) {
 		if closeErr != nil {
 			return "", closeErr
 		}
+	}
+	// PDF is an optional local renderer because deployment images may not carry
+	// a Unicode font. Markdown/JSON are already complete and remain available.
+	if err := ExportPDF(prefix+".pdf", structuredReport); err != nil && !errors.Is(err, ErrPDFUnavailable) {
+		return "", err
 	}
 	return prefix, nil
 }

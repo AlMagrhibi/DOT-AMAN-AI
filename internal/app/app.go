@@ -111,7 +111,13 @@ func (a *App) Run(ctx context.Context, session, prompt string, approve func(tool
 			retErr = errors.Join(retErr, err)
 			return
 		}
-		if err = a.Store.SaveExperiment(recordCtx, session, prompt, a.Config.Mode, status, string(b), detail); err != nil {
+		lessons := ""
+		if retErr != nil {
+			lessons = "execution stopped; inspect the recorded error and actual tool evidence"
+		} else {
+			lessons = "validated local response and retained original evidence"
+		}
+		if err = a.Store.SaveExperimentDetail(recordCtx, session, prompt, a.Config.Mode, status, string(b), detail, "bounded local model planning and registered-tool execution", len(out.Results)+1, retErr == nil, lessons); err != nil {
 			retErr = errors.Join(retErr, fmt.Errorf("experiment log: %w", err))
 		}
 	}()

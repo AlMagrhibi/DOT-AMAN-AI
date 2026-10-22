@@ -13,7 +13,7 @@ States describe implemented scope, not an unconditional product acceptance claim
 | 6 Memory/context | Complete for bounded local scope | Conservative/custom token estimator, cross-session reviewed project memory, isolated episodic memory, automatic hierarchical compression with originals retained and restart/mutation tests |
 | 7 Agent | Complete for tested registry scope | Modes, 4-call/90s limits, RAG/context, actual observations, experiment persistence, deterministic schema planning, duplicate suppression, explicit service/package authorized actions with argv validation |
 | 8 TUI | Partial | Bubble Tea, Markdown, stream, sessions, memory, search, confirmation, copy substitute; real PTY + Unicode/resize passed at `ac6f6fa`, `174f6ff`; actual Wayland/target bidi pending |
-| 9 Reports/Arch | Partial | Arabic structured Markdown/legacy+security JSON evidence exports; read-only systemd/journal/pacman/ip/process/filesystem registry plus constrained service/package repair; target Arch runtime/privileged authentication not validated |
+| 9 Reports/Arch | Partial | Arabic structured Markdown/legacy+security JSON and conditional Unicode-font PDF export; read-only systemd/journal/pacman/ip/process/filesystem registry plus constrained service/package repair; target Arch runtime/privileged authentication not validated |
 | 10 Hardening | Complete for Cloud scope | gofmt/vet/build, unit/integration/race, bounded fuzz, module integrity and govulncheck v1.9.0 all passed; real 4B evaluator passed its declared smoke set |
 | 11 Handoff | Partial | Local setup, pinned build/start/download scripts, continuously pushed source and real Cloud evidence; final acceptance still requires CachyOS/i5/Wayland/Arch/network-isolation checks |
 

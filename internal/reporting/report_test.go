@@ -1,6 +1,7 @@
 package reporting
 
 import (
+	"bytes"
 	"encoding/json"
 	"github.com/AlMagrhibi/DOT-AMAN-AI/internal/app"
 	"github.com/AlMagrhibi/DOT-AMAN-AI/internal/tools"
@@ -34,6 +35,12 @@ func TestReportEvidenceAndPermissions(t *testing.T) {
 	md, err := os.ReadFile(p + ".md")
 	if err != nil || !strings.Contains(string(md), "CVSS") || !strings.Contains(string(md), "الأدلة") {
 		t.Fatalf("markdown report missing required fields: %v", err)
+	}
+	if pdfFontPath() != "" {
+		pdf, pdfErr := os.ReadFile(p + ".pdf")
+		if pdfErr != nil || !bytes.HasPrefix(pdf, []byte("%PDF-")) {
+			t.Fatalf("PDF was expected with an available Unicode font: %v", pdfErr)
+		}
 	}
 	info, err := os.Stat(p + ".json")
 	if err != nil || info.Mode().Perm() != 0600 {
