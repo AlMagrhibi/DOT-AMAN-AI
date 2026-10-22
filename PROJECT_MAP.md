@@ -7,8 +7,8 @@
 | 2 Tools | Complete | Fixed registry, audit fail-closed, process-group cancellation, output caps, root confinement; 4 tests + fuzz seed passed |
 | 3 Provider | Complete | Local-only HTTP, health/model info, chat/complete, schema suggestions, SSE, cancellation/redirect tests |
 | 4 llama.cpp | Deferred | Not implemented yet |
-| 5 Knowledge | Deferred | Not implemented yet |
-| 6 Memory/context | Deferred | Not implemented yet |
+| 5 Knowledge | Partial | FTS5 BM25, Arabic normalization, provenance, versioned document replacement/import/search tested; live feed and evaluation pending |
+| 6 Memory/context | Partial | Reviewed memory correction/deletion/isolation and source-linked summary storage tested; automatic hierarchical compression pending |
 | 7 Agent | Deferred | Not implemented yet |
 | 8 TUI | Deferred | Not implemented yet |
 | 9 Reports/Arch | Deferred | Not implemented yet |
