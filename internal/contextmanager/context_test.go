@@ -26,3 +26,21 @@ func TestMandatoryBudget(t *testing.T) {
 		t.Fatal("overflow")
 	}
 }
+
+func TestTokenizerEstimatorPreservesRequiredMessages(t *testing.T) {
+	history := []model.Message{{Role: "user", Content: strings.Repeat("word ", 40)}, {Role: "assistant", Content: "recent"}}
+	// A deterministic local tokenizer stand-in: one token per five bytes.
+	cheap := func(s string) int { return (len(s)+4)/5 + 1 }
+	m, err := BuildWithEstimator("SAFETY", "current", history, "reference", 64, 16, cheap)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if m[0].Role != "system" || m[len(m)-1].Content != "current" {
+		t.Fatalf("required messages missing: %+v", m)
+	}
+	for _, x := range m {
+		if cheap(x.Content) > 64-16 {
+			t.Fatal("message exceeded custom token budget")
+		}
+	}
+}

@@ -50,6 +50,14 @@ func Open(c config.Config, p model.Provider) (*App, error) {
 		s.Close()
 		return nil, err
 	}
+	if c.EmbeddingEndpoint != "" {
+		e, embedErr := knowledge.NewHTTPEmbedder(c.EmbeddingEndpoint)
+		if embedErr != nil {
+			s.Close()
+			return nil, embedErr
+		}
+		k.SetEmbedder(e)
+	}
 	m, err := memory.New(s.DB)
 	if err != nil {
 		s.Close()
@@ -85,6 +93,9 @@ func (a *App) Run(ctx context.Context, session, prompt string, approve func(tool
 	}
 	if err = a.Store.Add(ctx, session, "user", prompt); err != nil {
 		return out, err
+	}
+	if err = a.Memory.MaybeCompress(ctx, session, a.Model, a.Config.Context); err != nil {
+		return out, fmt.Errorf("automatic memory compression: %w", err)
 	}
 	defer func() {
 		recordCtx, done := context.WithTimeout(context.WithoutCancel(ctx), 3*time.Second)

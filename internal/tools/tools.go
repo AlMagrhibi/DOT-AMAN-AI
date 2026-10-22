@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"sync"
 	"syscall"
@@ -39,8 +40,10 @@ type Engine struct {
 	Runner Runner
 }
 type Args struct {
-	Path  string `json:"path,omitempty"`
-	Limit int    `json:"limit,omitempty"`
+	Path     string   `json:"path,omitempty"`
+	Limit    int      `json:"limit,omitempty"`
+	Service  string   `json:"service,omitempty"`
+	Packages []string `json:"packages,omitempty"`
 }
 type Spec struct {
 	Name        string `json:"name"`
@@ -48,16 +51,38 @@ type Spec struct {
 	Parameters  any    `json:"parameters"`
 }
 
-var descriptions = map[string]string{"read_file": "Read UTF-8 file inside configured root", "list_dir": "List directory inside configured root", "system_info": "Kernel and architecture", "go_version": "Installed Go version", "services": "Local systemd service states", "packages": "Arch installed packages", "network": "Local interface addresses", "journal": "Recent local system journal"}
+var descriptions = map[string]string{
+	"read_file":       "Read UTF-8 file inside configured root",
+	"list_dir":        "List directory inside configured root",
+	"system_info":     "Kernel and architecture",
+	"go_version":      "Installed Go version",
+	"services":        "Local systemd service states",
+	"packages":        "Arch installed packages",
+	"network":         "Local interface addresses",
+	"journal":         "Recent local system journal",
+	"processes":       "Local process resource snapshot",
+	"filesystem":      "Local filesystem capacity snapshot",
+	"service_restart": "Restart one explicitly named local systemd service after authorization",
+	"package_install": "Install explicitly named Arch packages after authorization",
+}
+
+var unitName = regexp.MustCompile(`^[A-Za-z0-9_.@-]{1,128}\.service$`)
+var packageName = regexp.MustCompile(`^[A-Za-z0-9@._+:-]{1,128}$`)
 
 func Specs() []Spec {
-	names := []string{"read_file", "list_dir", "system_info", "go_version", "services", "packages", "network", "journal"}
+	names := []string{"read_file", "list_dir", "system_info", "go_version", "services", "packages", "network", "journal", "processes", "filesystem", "service_restart", "package_install"}
 	out := make([]Spec, 0, len(names))
 	for _, n := range names {
 		p := map[string]any{"type": "object", "properties": map[string]any{}, "additionalProperties": false}
 		if n == "read_file" || n == "list_dir" {
 			p["properties"] = map[string]any{"path": map[string]any{"type": "string", "maxLength": 4096}, "limit": map[string]any{"type": "integer", "minimum": 1, "maximum": 65536}}
 			p["required"] = []string{"path"}
+		} else if n == "service_restart" {
+			p["properties"] = map[string]any{"service": map[string]any{"type": "string", "pattern": `^[A-Za-z0-9_.@-]{1,128}\\.service$`}}
+			p["required"] = []string{"service"}
+		} else if n == "package_install" {
+			p["properties"] = map[string]any{"packages": map[string]any{"type": "array", "minItems": 1, "maxItems": 16, "items": map[string]any{"type": "string", "pattern": `^[A-Za-z0-9@._+:-]{1,128}$`}}}
+			p["required"] = []string{"packages"}
 		}
 		out = append(out, Spec{n, descriptions[n], p})
 	}
@@ -87,11 +112,11 @@ func Validate(c Call) (Args, error) {
 	if err := json.Unmarshal(c.Arguments, &raw); err != nil || raw == nil {
 		return a, fmt.Errorf("arguments must be an object")
 	}
-	if c.Name != "read_file" && c.Name != "list_dir" && len(raw) != 0 {
+	if c.Name != "read_file" && c.Name != "list_dir" && c.Name != "service_restart" && c.Name != "package_install" && len(raw) != 0 {
 		return a, fmt.Errorf("tool takes no arguments")
 	}
 	for k, v := range raw {
-		if k != "path" && k != "limit" {
+		if k != "path" && k != "limit" && k != "service" && k != "packages" {
 			return a, fmt.Errorf("unknown argument")
 		}
 		if string(v) == "null" {
@@ -111,7 +136,20 @@ func Validate(c Call) (Args, error) {
 		if a.Limit < 1 || a.Limit > 65536 {
 			return a, fmt.Errorf("invalid output limit")
 		}
-	} else if a.Path != "" || a.Limit != 0 {
+	} else if c.Name == "service_restart" {
+		if len(raw) != 1 || a.Service == "" || !unitName.MatchString(a.Service) {
+			return a, fmt.Errorf("service must be one explicitly named .service unit")
+		}
+	} else if c.Name == "package_install" {
+		if len(raw) != 1 || len(a.Packages) < 1 || len(a.Packages) > 16 {
+			return a, fmt.Errorf("one to sixteen packages required")
+		}
+		for _, name := range a.Packages {
+			if !packageName.MatchString(name) {
+				return a, fmt.Errorf("invalid package name")
+			}
+		}
+	} else if a.Path != "" || a.Limit != 0 || a.Service != "" || len(a.Packages) != 0 {
 		return a, fmt.Errorf("tool takes no arguments")
 	}
 	return a, nil
@@ -134,8 +172,14 @@ func (e *Engine) Execute(ctx context.Context, session string, c Call) (Result, e
 	if c.Name == "read_file" || c.Name == "list_dir" {
 		r.Output, err = e.files(ctx, c.Name, a)
 	} else {
-		commands := map[string][]string{"system_info": {"uname", "-srmo"}, "go_version": {"go", "version"}, "services": {"systemctl", "list-units", "--type=service", "--no-pager", "--plain"}, "packages": {"pacman", "-Q"}, "network": {"ip", "-brief", "address"}, "journal": {"journalctl", "--no-pager", "-n", "100", "--output=short"}}
+		commands := map[string][]string{"system_info": {"uname", "-srmo"}, "go_version": {"go", "version"}, "services": {"systemctl", "list-units", "--type=service", "--no-pager", "--plain"}, "packages": {"pacman", "-Q"}, "network": {"ip", "-brief", "address"}, "journal": {"journalctl", "--no-pager", "-n", "100", "--output=short"}, "processes": {"ps", "-eo", "pid,comm,%cpu,%mem", "--sort=-%cpu"}, "filesystem": {"df", "-h", "-x", "tmpfs"}}
 		v := commands[c.Name]
+		if c.Name == "service_restart" {
+			v = []string{"systemctl", "restart", "--no-ask-password", "--", a.Service}
+		}
+		if c.Name == "package_install" {
+			v = append([]string{"pacman", "--noconfirm", "-S", "--needed", "--"}, a.Packages...)
+		}
 		runner := e.Runner
 		if runner == nil {
 			runner = ProcessRunner{}
@@ -154,6 +198,10 @@ func (e *Engine) Execute(ctx context.Context, session string, c Call) (Result, e
 	}
 	return r, err
 }
+
+// IsMutating identifies the small, explicit set of authorized repair tools.
+// The registry never exposes an arbitrary shell or package expression.
+func IsMutating(c Call) bool { return c.Name == "service_restart" || c.Name == "package_install" }
 func (e *Engine) record(ctx context.Context, s, n, status, detail string) error {
 	if e.Audit == nil {
 		return fmt.Errorf("audit unavailable")

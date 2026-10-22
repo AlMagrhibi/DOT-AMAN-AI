@@ -1,0 +1,12 @@
+[
+  {"id":"firewall","source":"semantic-fixture","url":"fixture:firewall","title":"Network firewall","text":"A network firewall filters traffic between trusted and untrusted zones and applies allow or deny rules."},
+  {"id":"least-privilege","source":"semantic-fixture","url":"fixture:least-privilege","title":"Least privilege","text":"Least privilege grants each account and process only the permissions required for its task."},
+  {"id":"mfa","source":"semantic-fixture","url":"fixture:mfa","title":"Multi-factor authentication","text":"Multi-factor authentication requires an additional factor beyond a password when a user signs in."},
+  {"id":"backup","source":"semantic-fixture","url":"fixture:backup","title":"Backup recovery","text":"Offline backups provide a recovery path after ransomware or accidental deletion."},
+  {"id":"tls","source":"semantic-fixture","url":"fixture:tls","title":"Transport encryption","text":"TLS encrypts data in transit and authenticates the remote endpoint with certificates."},
+  {"id":"patching","source":"semantic-fixture","url":"fixture:patching","title":"Security patching","text":"Security updates fix known defects and should be tested and applied according to exposure and risk."},
+  {"id":"logging","source":"semantic-fixture","url":"fixture:logging","title":"Audit logging","text":"Audit logs record security-relevant events with timestamps so investigations can reconstruct activity."},
+  {"id":"sql","source":"semantic-fixture","url":"fixture:sql","title":"Parameterized SQL","text":"Parameterized queries keep user data separate from SQL syntax and reduce injection risk."},
+  {"id":"xss","source":"semantic-fixture","url":"fixture:xss","title":"Output encoding","text":"Context-aware output encoding prevents untrusted browser content from being interpreted as script."},
+  {"id":"secrets","source":"semantic-fixture","url":"fixture:secrets","title":"Secret handling","text":"Secrets should be stored in a protected local store and excluded from source control and logs."}
+]

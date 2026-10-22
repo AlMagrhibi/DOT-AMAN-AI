@@ -24,10 +24,16 @@ func (a *audit) Audit(_ context.Context, _, _, s, _ string) error {
 	return nil
 }
 
-type runner struct{ calls int }
+type runner struct {
+	calls int
+	name  string
+	args  []string
+}
 
-func (r *runner) Run(context.Context, string, []string) (string, error) {
+func (r *runner) Run(_ context.Context, name string, args []string) (string, error) {
 	r.calls++
+	r.name = name
+	r.args = append([]string(nil), args...)
 	return "actual", nil
 }
 func TestRejectBeforeRunner(t *testing.T) {
@@ -37,6 +43,37 @@ func TestRejectBeforeRunner(t *testing.T) {
 		e := Engine{Root: t.TempDir(), Audit: a, Runner: r}
 		if _, err := e.Execute(context.Background(), "s", c); err == nil || r.calls != 0 || len(a.events) != 1 || a.events[0] != "rejected" {
 			t.Fatalf("%+v calls=%d events=%v", c, r.calls, a.events)
+		}
+	}
+}
+
+func TestAuthorizedArchActionsAreConstrained(t *testing.T) {
+	for _, c := range []Call{
+		{Name: "service_restart", Arguments: json.RawMessage(`{"service":"sshd.service"}`)},
+		{Name: "package_install", Arguments: json.RawMessage(`{"packages":["openssl","linux-zen"]}`)},
+	} {
+		r := &runner{}
+		e := Engine{Root: t.TempDir(), Audit: &audit{}, Runner: r}
+		if _, err := e.Execute(context.Background(), "s", c); err != nil || r.calls != 1 {
+			t.Fatalf("authorized action failed: %+v err=%v calls=%d", c, err, r.calls)
+		}
+		if c.Name == "service_restart" && (r.name != "systemctl" || strings.Join(r.args, " ") != "restart --no-ask-password -- sshd.service") {
+			t.Fatalf("unsafe service argv: %s %v", r.name, r.args)
+		}
+		if c.Name == "package_install" && (r.name != "pacman" || strings.Join(r.args, " ") != "--noconfirm -S --needed -- openssl linux-zen") {
+			t.Fatalf("unsafe package argv: %s %v", r.name, r.args)
+		}
+	}
+	for _, c := range []Call{
+		{Name: "service_restart", Arguments: json.RawMessage(`{"service":"../../evil.service"}`)},
+		{Name: "service_restart", Arguments: json.RawMessage(`{"service":"sshd.service;rm"}`)},
+		{Name: "package_install", Arguments: json.RawMessage(`{"packages":["openssl;rm"]}`)},
+		{Name: "package_install", Arguments: json.RawMessage(`{"packages":["--root=/tmp"]}`)},
+	} {
+		r := &runner{}
+		e := Engine{Root: t.TempDir(), Audit: &audit{}, Runner: r}
+		if _, err := e.Execute(context.Background(), "s", c); err == nil || r.calls != 0 {
+			t.Fatalf("unsafe action reached runner: %+v err=%v calls=%d", c, err, r.calls)
 		}
 	}
 }

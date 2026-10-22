@@ -48,6 +48,8 @@ dotamanai-codex
 
 Default inference: numeric loopback `127.0.0.1:8081`; proxies and redirects are disabled for inference. Model service binds loopback. No auto download, sync, cloud AI or telemetry. Processes must restart after machine restart. Try context 2048 and 4096 on the target; do not extrapolate Cloud performance.
 
+Optional semantic retrieval uses a second local llama-server in embedding mode. Download and verify the Nomic lock in `configs/embedding-model-lock.json`, then run `scripts/start-embedding.sh` with `LLAMA_SERVER` and `EMBEDDING_MODEL_PATH`; set `embedding_endpoint = "http://127.0.0.1:8082"` in the config and run `reindex-embeddings`. The embedding server is loopback-only and receives no external or cloud requests.
+
 ## الإعدادات والبيانات
 
 Without an explicit config the application uses `$XDG_DATA_HOME/dotamanai-codex`, falling back to `~/.local/share/dotamanai-codex`. Data directory mode is 0700 and database mode 0600. For a config, copy `configs/example.toml` to `~/.config/dotamanai-codex/config.toml`, replace **both absolute directories** with your own paths, and pass `-config PATH`. Config is intentionally loaded only when explicitly specified. Cache location for llama build above is `~/.cache/dotamanai-codex`.
@@ -69,11 +71,11 @@ dotamanai-codex sync owasp
 dotamanai-codex sync cisa-kev
 ```
 
-Flags precede the command. Imported files are data, never commands. Plain text/Markdown/JSON/CSV/log/TOML/Go/shell text import is supported up to 2 MiB; PDF/DOCX are not supported. Search is lexical FTS5/BM25, with Arabic letter/diacritic normalization; semantic synonyms need further work. No embedding service exists.
+Flags precede the command. Imported files are data, never commands. Plain text/Markdown/JSON/CSV/log/TOML/Go/shell text import is supported up to 2 MiB; text-based PDF and DOCX extraction is bounded to 16 MiB and tested. Scanned/image-only PDFs are rejected. Search uses lexical FTS5/BM25 and, when configured, local Nomic embeddings with Arabic normalization. Semantic indexing is explicit through `reindex-embeddings`; there is no automatic external download.
 
 TUI: `/help`, `/new`, `/sessions`, `/resume ID`, `/delete-session ID`, `/mode analysis|confirm|auto`, `/search WORDS`, `/import PATH`, `/sources`, `/remember TEXT`, `/facts`, `/correct ID TEXT`, `/forget ID`, `/experiments`, `/export`, `/stats`, `/copy`. PgUp/PgDown scroll, Ctrl+C cancels a request, Ctrl+Q quits. Terminal-dependent Arabic bidi behavior remains a target acceptance check. `/copy` requires local `wl-copy` (`wl-clipboard` package); it copies only on an explicit command. A clipboard substitute and PTY interaction are Cloud-tested; actual KDE/Wayland is not.
 
-`/remember` explicitly promotes user-provided memory with provenance. Summaries are labeled unverified, retain original message ranges, and are invalidated after source edits/deletions. `summarize` is an explicit bounded local operation; it does not train the model. Application history reads at most 64 recent messages for generation. Original messages remain stored and exportable.
+`/remember` explicitly promotes user-provided memory with provenance. Reviewed project memory is available across sessions; episodic memory remains session-scoped. Summaries are labeled unverified, retain original message ranges, and are invalidated after source edits/deletions. Compression triggers automatically for long sessions and is also available through `summarize`; it does not train the model. Application history reads at most 64 recent messages for generation. Original messages remain stored and exportable. `/export` writes legacy JSON, structured `.security.json`, and Arabic Markdown.
 
 ## اختبارات القبول على الجهاز
 

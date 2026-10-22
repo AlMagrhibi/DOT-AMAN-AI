@@ -1,4 +1,6 @@
 endpoint = "http://127.0.0.1:8081"
+# Optional local llama-server --embedding endpoint; leave empty for FTS5-only mode.
+embedding_endpoint = ""
 # Set absolute local paths for your account:
 data_dir = "/tmp/dotamanai-codex-example"
 root = "/tmp"

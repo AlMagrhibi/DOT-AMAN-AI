@@ -102,8 +102,23 @@ func run(ctx context.Context, args []string) error {
 			return err
 		}
 		return encode(v)
+	case "reindex-embeddings":
+		if c.EmbeddingEndpoint == "" {
+			return fmt.Errorf("embedding_endpoint is not configured")
+		}
+		n, err := a.Knowledge.EnsureEmbeddings(ctx, 10000)
+		if err != nil {
+			return err
+		}
+		return encode(map[string]any{"indexed": n})
 	case "sources":
 		v, err := a.Knowledge.Sources(ctx)
+		if err != nil {
+			return err
+		}
+		return encode(v)
+	case "sync-history":
+		v, err := a.Knowledge.SyncHistory(ctx, f.Arg(1), 20)
 		if err != nil {
 			return err
 		}
@@ -127,7 +142,7 @@ func run(ctx context.Context, args []string) error {
 		fmt.Println("Session:", o.Session)
 		return nil
 	default:
-		return fmt.Errorf("commands: doctor, chat TEXT, sessions, export-session ID, delete-session ID, import PATH, search QUERY, sources, sync cisa-kev|owasp")
+		return fmt.Errorf("commands: doctor, chat TEXT, sessions, export-session ID, delete-session ID, import PATH, search QUERY, reindex-embeddings, sources, sync-history SOURCE, sync cisa-kev|owasp")
 	}
 }
 func main() {

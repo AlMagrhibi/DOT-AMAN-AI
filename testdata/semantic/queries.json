@@ -1,0 +1,14 @@
+[
+  {"query":"What controls packets crossing a trust boundary?","expected":"firewall","language":"en"},
+  {"query":"How can privileges be limited to only what a job needs?","expected":"least-privilege","language":"en"},
+  {"query":"What login defense asks for another proof besides a password?","expected":"mfa","language":"en"},
+  {"query":"What helps restore data after ransomware?","expected":"backup","language":"en"},
+  {"query":"How is information protected while traveling across a network?","expected":"tls","language":"en"},
+  {"query":"What fixes publicly known software weaknesses?","expected":"patching","language":"en"},
+  {"query":"Where can investigators review past security events?","expected":"logging","language":"en"},
+  {"query":"How do applications keep values from becoming SQL commands?","expected":"sql","language":"en"},
+  {"query":"How do websites stop injected browser scripts?","expected":"xss","language":"en"},
+  {"query":"Where should API keys be kept so they are not published?","expected":"secrets","language":"en"},
+  {"query":"ما الذي يمنع مرور الحزم بين المناطق الموثوقة وغير الموثوقة؟","expected":"firewall","language":"ar"},
+  {"query":"كيف نعطي المستخدم أقل صلاحيات لازمة؟","expected":"least-privilege","language":"ar"}
+]

@@ -4,7 +4,10 @@ set -eu
 URL=${1:?usage: download-model.sh HTTPS_QWEN_URL DEST_GGUF EXPECTED_SHA256}
 DEST=${2:?destination GGUF required}
 SHA=${3:?expected SHA256 from publisher LFS metadata required}
-case "$URL" in https://huggingface.co/Qwen/*) ;; *) echo 'only official Qwen HTTPS model URLs supported' >&2;exit 1;; esac
+case "$URL" in
+  https://huggingface.co/Qwen/*|https://huggingface.co/nomic-ai/nomic-embed-text-v1.5-GGUF/*) ;;
+  *) echo 'only official Qwen or Nomic embedding HTTPS model URLs supported' >&2; exit 1 ;;
+esac
 case "$SHA" in *[!0-9a-fA-F]*|'') echo 'invalid SHA256' >&2;exit 1;; esac
 test "${#SHA}" = 64
 MAX_BYTES=${MODEL_DOWNLOAD_MAX_BYTES:-2147483648}

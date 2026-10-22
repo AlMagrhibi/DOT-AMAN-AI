@@ -48,7 +48,22 @@ func TestReviewIsolationCorrectionDeletion(t *testing.T) {
 	if err != nil || len(x) != 1 {
 		t.Fatal(x, err)
 	}
+	x, err = m.Recall(ctx, b, "new")
+	if err != nil || len(x) != 1 || x[0].Session != a {
+		t.Fatal("project memory was not available after session change", x, err)
+	}
+	episodicID, err := m.Put(ctx, Item{Session: a, Kind: "episodic", Text: "session-only event", Source: "tool", Reviewed: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	x, err = m.Recall(ctx, b, "session-only")
+	if err != nil || len(x) != 0 {
+		t.Fatal("episodic memory leaked across sessions", x, err)
+	}
 	if err = m.Delete(ctx, a, id); err != nil {
+		t.Fatal(err)
+	}
+	if err = m.Delete(ctx, a, episodicID); err != nil {
 		t.Fatal(err)
 	}
 	x, err = m.Recall(ctx, a, "")

@@ -13,12 +13,13 @@ import (
 )
 
 type Config struct {
-	Endpoint  string `toml:"endpoint"`
-	DataDir   string `toml:"data_dir"`
-	Root      string `toml:"root"`
-	Mode      string `toml:"mode"`
-	Context   int    `toml:"context"`
-	MaxOutput int    `toml:"max_output"`
+	Endpoint          string `toml:"endpoint"`
+	EmbeddingEndpoint string `toml:"embedding_endpoint"`
+	DataDir           string `toml:"data_dir"`
+	Root              string `toml:"root"`
+	Mode              string `toml:"mode"`
+	Context           int    `toml:"context"`
+	MaxOutput         int    `toml:"max_output"`
 }
 
 func Default() (Config, error) {
@@ -50,6 +51,11 @@ func ValidateEndpoint(s string) error {
 func (c Config) Validate() error {
 	if err := ValidateEndpoint(c.Endpoint); err != nil {
 		return err
+	}
+	if c.EmbeddingEndpoint != "" {
+		if err := ValidateEndpoint(c.EmbeddingEndpoint); err != nil {
+			return fmt.Errorf("embedding endpoint: %w", err)
+		}
 	}
 	if !filepath.IsAbs(c.DataDir) || !filepath.IsAbs(c.Root) {
 		return fmt.Errorf("data_dir and root must be absolute")

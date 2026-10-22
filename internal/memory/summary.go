@@ -9,6 +9,31 @@ import (
 	"strings"
 )
 
+// MaybeCompress is the automatic bounded trigger used by the conversation
+// path. It keeps the complete originals and only creates summaries once the
+// active session exceeds the compacting threshold.
+func (m *Memory) MaybeCompress(ctx context.Context, session string, p model.Provider, window int) error {
+	rows, err := m.DB.QueryContext(ctx, `SELECT id,session,role,content,created FROM messages WHERE session=? ORDER BY id`, session)
+	if err != nil {
+		return err
+	}
+	messages := []storage.Message{}
+	for rows.Next() {
+		var x storage.Message
+		if err = rows.Scan(&x.ID, &x.Session, &x.Role, &x.Content, &x.Created); err != nil {
+			rows.Close()
+			return err
+		}
+		messages = append(messages, x)
+	}
+	if err = rows.Err(); err != nil {
+		rows.Close()
+		return err
+	}
+	rows.Close()
+	return m.Compress(ctx, session, messages, p, window)
+}
+
 // Compress summarizes older messages in bounded batches and combines four level-1
 // summaries into a level-2 summary. Originals remain authoritative and unchanged.
 func (m *Memory) Compress(ctx context.Context, session string, messages []storage.Message, p model.Provider, window int) error {

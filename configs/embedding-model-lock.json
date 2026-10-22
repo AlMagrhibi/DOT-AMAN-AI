@@ -1,0 +1,11 @@
+{
+  "repository": "nomic-ai/nomic-embed-text-v1.5-GGUF",
+  "revision": "0188c9bf409793f810680a5a431e7b899c46104c",
+  "filename": "nomic-embed-text-v1.5.Q4_K_M.gguf",
+  "sha256": "d4e388894e09cf3816e8b0896d81d265b55e7a9fff9ab03fe8bf4ef5e11295ac",
+  "size_bytes": 84106624,
+  "license": "Apache-2.0",
+  "metadata_url": "https://huggingface.co/nomic-ai/nomic-embed-text-v1.5-GGUF/resolve/0188c9bf409793f810680a5a431e7b899c46104c/README.md",
+  "metadata_sha256": "2e1a99a21b550c6cdd965859790d0d10cca21a48800c8c83d6345afebb49cd98",
+  "purpose": "Offline local semantic retrieval; no remote embedding API"
+}

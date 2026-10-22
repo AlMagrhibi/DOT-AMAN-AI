@@ -10,6 +10,44 @@ import (
 	"testing"
 )
 
+func TestAutomaticMemoryCompression(t *testing.T) {
+	c, err := config.Default()
+	if err != nil {
+		t.Fatal(err)
+	}
+	c.DataDir = t.TempDir()
+	c.Root = t.TempDir()
+	c.Mode = "analysis"
+	a, err := Open(c, model.Mock{Text: "إجابة محفوظة"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer a.Close()
+	ctx := context.Background()
+	var session string
+	for i := 0; i < 9; i++ {
+		out, runErr := a.Run(ctx, session, fmt.Sprintf("رسالة طويلة رقم %d", i), nil, nil)
+		if runErr != nil {
+			t.Fatal(runErr)
+		}
+		session = out.Session
+	}
+	var summaries int
+	if err = a.Store.DB.QueryRowContext(ctx, `SELECT count(*) FROM summaries WHERE session=?`, session).Scan(&summaries); err != nil {
+		t.Fatal(err)
+	}
+	if summaries == 0 {
+		t.Fatal("automatic compression did not create a summary")
+	}
+	messages, err := a.Store.Messages(ctx, session)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(messages) != 18 {
+		t.Fatalf("original messages were not retained: got %d", len(messages))
+	}
+}
+
 func TestWorkflowPersistenceAndModes(t *testing.T) {
 	for _, mode := range []string{"analysis", "confirm", "auto"} {
 		t.Run(mode, func(t *testing.T) {

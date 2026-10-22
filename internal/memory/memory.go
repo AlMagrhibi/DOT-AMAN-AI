@@ -41,7 +41,9 @@ func (m *Memory) Recall(ctx context.Context, session, query string) ([]Item, err
 	if len(query) > 1024 {
 		return nil, fmt.Errorf("query too long")
 	}
-	rows, err := m.DB.QueryContext(ctx, `SELECT id,session,kind,text,source,reviewed FROM memory WHERE session=? AND reviewed=1 AND instr(lower(text),lower(?))>0 ORDER BY id DESC LIMIT 20`, session, query)
+	// Project memory is intentionally shared across sessions; episodic and
+	// session memory remain isolated to the requested session.
+	rows, err := m.DB.QueryContext(ctx, `SELECT id,session,kind,text,source,reviewed FROM memory WHERE reviewed=1 AND (session=? OR kind='project') AND instr(lower(text),lower(?))>0 ORDER BY id DESC LIMIT 20`, session, query)
 	if err != nil {
 		return nil, err
 	}
