@@ -1,8 +1,8 @@
-> Resumed status: Go dependency vulnerability scan now completed cleanly with govulncheck v1.9.0; natural-question retrieval fixed and unchanged fixture recall now 60/60. Official model metadata/license reviewed and locked. Weight transfer is still blocked by the newly observed us.aws.cdn.hf.co redirect; no real-GGUF results are claimed. Prepared evaluator and server-resource runner are ready for that prerequisite.
+> Current status: Go dependency vulnerability scan is clean with govulncheck v1.9.0; natural-question retrieval is 60/60 on the unchanged fixture set. Official Qwen3-4B metadata/license and full GGUF digest were verified outside Git. The real Cloud evaluator passed its declared smoke scope; target-device checks remain open.
 
 # Codex Cloud implementation report
 
-Repository: https://github.com/AlMagrhibi/DOT-AMAN-AI, branch `main`. **Partial delivery; complete real-model acceptance is blocked.** Source and tested milestones have been pushed throughout development. Exact milestone SHAs and statuses are in PROJECT_MAP.md; final delivery SHA is reported in chat to avoid a self-referential commit hash.
+Repository: https://github.com/AlMagrhibi/DOT-AMAN-AI, branch `main`. **Cloud evaluation is complete for the declared smoke scope; target-device acceptance remains open.** Source and tested milestones have been pushed throughout development. Exact milestone SHAs and statuses are in PROJECT_MAP.md; final delivery SHA is reported in chat to avoid a self-referential commit hash.
 
 ## Implemented and Cloud verified
 
@@ -12,15 +12,15 @@ Repository: https://github.com/AlMagrhibi/DOT-AMAN-AI, branch `main`. **Partial 
 - Fixed read-only ToolRegistry, strict validators, confined file access, no raw shell, output/time bounds, process-group cancellation, audit rejection before execution. Tested invalid suggestions produce zero runner invocations. Audit storage failure blocks execution.
 - Bounded agent modes, 4 tool calls, 90-second task timeout, confirmation and cancellation; actual tool observations preserved. Experiments record completion/failure and result evidence locally. No model weight training.
 - Compact Bubble Tea TUI, Markdown, Arabic/English, SSE streaming, sessions/memory/search, confirmation, explicit copy, actual local frontend CPU/peak RSS/heap metrics and N/A GPU. PTY and clipboard-substitute checks passed; KDE clipboard is unrun.
-- Local Arabic Markdown/JSON report export with private permissions. Pinned scripts for Cloud setup, llama build, explicit digest-verified model download and loopback startup.
+- Local Arabic Markdown/JSON report export with private permissions. Pinned scripts for Cloud setup, llama build, explicit digest-verified model download and loopback startup. The Qwen3-4B Q4_K_M license and full GGUF digest were verified outside Git.
 
 ## Validation and limits
 
-See BENCHMARKS.md and docs/validation for executed commands and evidence. Narrow lexical Recall@5: 58/60. Unit/integration/race and bounded fuzz tests passed. llama-server and llama-bench compiled and reported pinned version. Go module integrity passed.
+See BENCHMARKS.md and docs/validation for executed commands and evidence. Narrow lexical Recall@5: 60/60. Unit/integration/race and bounded fuzz tests passed. llama-server and llama-bench compiled and reported pinned version. Go module integrity and govulncheck v1.9.0 passed. The real 4B evaluator passed its Arabic/English, Schema, streaming, RAG, session, memory and Auto checks; its Cloud metrics are documented separately.
 
-A model download from Hugging Face and the Go vulnerability database returned network-policy denials. No real GGUF inference, model quality/security evaluation or tok/s claim is made. No model digest or license was fabricated. Pending live checks cannot be replaced by fixture results.
+A model download and vulnerability database were initially blocked by network policy; the environment configuration was updated and the real checks were later executed. The retained 0.6B/1.7B reports show earlier failures. The passing 4B report is a small declared smoke suite, not broad model quality or adversarial security proof, and no GGUF is stored in Git.
 
-The saved Cloud configuration contains `install_script`, `start_skill`, and explicit network additions. Saving the draft does not apply or publish it. Review/save/publish environment settings, then resume model download (verify publisher metadata), server health, Arabic/English/chat/schema/stream evaluation, repeated benchmarks and vulnerability scan. Continue quality hardening based on those results; the environment is not fully ready for the complete intended workflow yet.
+The saved Cloud configuration contains `install_script`, `start_skill`, and explicit network additions. Startup instructions must point to a locally verified GGUF and keep the model outside the checkout. Re-run the documented checks after any model or llama.cpp change; Cloud results do not substitute for target CachyOS validation.
 
 ## Target-device verification
 

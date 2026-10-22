@@ -1,0 +1,190 @@
+{
+  "scope": "Codex Cloud real local GGUF smoke/benchmark; small sample, not target-device performance or comprehensive model quality",
+  "model": "/workspace/models/Qwen3-1.7B-Q8_0.gguf",
+  "date_utc": "2026-10-22T08:56:02Z",
+  "settings": {
+    "latency_percentiles": "nearest rank",
+    "max_output": 96,
+    "quality_rubric": "language presence plus lexical least-privilege access/minimum evidence; manual semantic review still required",
+    "repetitions": 3,
+    "stream": true,
+    "temperature": 0.2,
+    "thinking": false,
+    "warmup": "one excluded English completion; server prefix cache may remain enabled"
+  },
+  "samples": [
+    {
+      "name": "english",
+      "prompt": "In English, explain least privilege in two short sentences.",
+      "text": "Least privilege is a security principle that ensures users and processes have only the minimum level of access necessary to perform their tasks. It prevents unauthorized access and reduces the risk of security breaches.",
+      "output_tokens": 37,
+      "input_tokens": 180,
+      "seconds": 5.10361558,
+      "ttft_seconds": 2.870074172,
+      "end_to_end_tokens_per_second": 7.249762334176432,
+      "passed": true
+    },
+    {
+      "name": "arabic",
+      "prompt": "اشرح بالعربية مبدأ أقل امتياز في جملتين قصيرتين.",
+      "text": "الملف المُحَرَّف (modified file) هو ملف يحتوي على نسخة مُحدثة من الملف الأصلي، ويُستخدم لتحسين الأداء أو التغيير في المحتوى.",
+      "output_tokens": 53,
+      "input_tokens": 189,
+      "seconds": 3.81741593,
+      "ttft_seconds": 0.594606015,
+      "end_to_end_tokens_per_second": 13.883737316515049,
+      "passed": false,
+      "error": "least-privilege concept rubric missing; requires manual semantic review"
+    },
+    {
+      "name": "english",
+      "prompt": "In English, explain least privilege in two short sentences.",
+      "text": "Least privilege is a security principle that limits user or process access to only what is necessary to perform their tasks. It ensures that users have the minimum level of access required to complete their functions, reducing the risk of unauthorized actions.",
+      "output_tokens": 46,
+      "input_tokens": 180,
+      "seconds": 2.902022777,
+      "ttft_seconds": 0.489216646,
+      "end_to_end_tokens_per_second": 15.8510127365551,
+      "passed": true
+    },
+    {
+      "name": "arabic",
+      "prompt": "اشرح بالعربية مبدأ أقل امتياز في جملتين قصيرتين.",
+      "text": "الإقل امتياز هو مبدأ يُطبق في نظام التشغيل لضمان أن الموارد (مثل الملفات والذاكرة) تُستخدم بشكل فعّال دون تجاوز حدود المطلوب.",
+      "output_tokens": 52,
+      "input_tokens": 189,
+      "seconds": 3.955480549,
+      "ttft_seconds": 0.654820641,
+      "end_to_end_tokens_per_second": 13.1463167005451,
+      "passed": false,
+      "error": "least-privilege concept rubric missing; requires manual semantic review"
+    },
+    {
+      "name": "english",
+      "prompt": "In English, explain least privilege in two short sentences.",
+      "text": "",
+      "output_tokens": 0,
+      "input_tokens": 0,
+      "seconds": 0,
+      "ttft_seconds": 0,
+      "end_to_end_tokens_per_second": 0,
+      "passed": false,
+      "error": "Post \"http://127.0.0.1:8081/v1/chat/completions\": EOF"
+    },
+    {
+      "name": "arabic",
+      "prompt": "اشرح بالعربية مبدأ أقل امتياز في جملتين قصيرتين.",
+      "text": "الملف المُحَفَّز (trigger file) هو ملف يُستخدم لتحديد المهام التي يجب إجراؤها عند تفعيل النظام أو عند تغيير حالة النظام.",
+      "output_tokens": 45,
+      "input_tokens": 189,
+      "seconds": 2.924340891,
+      "ttft_seconds": 0.262930686,
+      "end_to_end_tokens_per_second": 15.388082879972286,
+      "passed": false,
+      "error": "least-privilege concept rubric missing; requires manual semantic review"
+    }
+  ],
+  "checks": [
+    {
+      "name": "warmup",
+      "passed": true,
+      "detail": "<nil>"
+    },
+    {
+      "name": "schema_0",
+      "passed": true,
+      "detail": "calls=[{system_info {}}] error=<nil>"
+    },
+    {
+      "name": "schema_1",
+      "passed": true,
+      "detail": "calls=[{system_info {}}] error=<nil>"
+    },
+    {
+      "name": "schema_2",
+      "passed": true,
+      "detail": "calls=[{system_info {}}] error=<nil>"
+    },
+    {
+      "name": "schema_3",
+      "passed": true,
+      "detail": "calls=[{system_info {}}] error=<nil>"
+    },
+    {
+      "name": "schema_4",
+      "passed": true,
+      "detail": "calls=[{system_info {}}] error=<nil>"
+    },
+    {
+      "name": "schema_5",
+      "passed": true,
+      "detail": "calls=[{system_info {}}] error=<nil>"
+    },
+    {
+      "name": "schema_selection",
+      "passed": true,
+      "detail": "valid=6 correct=6 total=6; small smoke set, not a global 95% claim"
+    },
+    {
+      "name": "stream_cancellation",
+      "passed": true,
+      "detail": "chunks=1 error=context canceled"
+    },
+    {
+      "name": "rag_grounded_answer",
+      "passed": true,
+      "detail": "answer=The synthetic KEYSTONE service listens on TCP port **43871**. This is evaluation data, not a real vulnerability.\n\nالمراجع المسترجعة (لا تعني التحقق من كل ادعاء):\n[keystone] fixture:keystone error=<nil>"
+    },
+    {
+      "name": "session_restart",
+      "passed": true,
+      "detail": "messages=2 error=<nil>"
+    },
+    {
+      "name": "reviewed_memory_recall",
+      "passed": true,
+      "detail": "answer=The synthetic project codename is **Cedar-Falcon-728**. This is evaluation data, not a real vulnerability.\n\nالمراجع المسترجعة (لا تعني التحقق من كل ادعاء):\n[keystone] fixture:keystone error=<nil>"
+    },
+    {
+      "name": "app_arabic_terminology",
+      "passed": false,
+      "detail": "answer=مبدأ أقل امتياز يعنى أن الأفراد أو الأنظمة يجب أن يحتفظوا بقليل من الموارد أو السلطة لتجنب التهديدات والاختراقات. error=<nil>"
+    },
+    {
+      "name": "agent_real_system_info",
+      "passed": true,
+      "detail": "tools=[{system_info Linux 6.18.55 x86_64 GNU/Linux\n  1.605498ms}] error=<nil>"
+    }
+  ],
+  "latency_p50_seconds": 3.81741593,
+  "latency_p95_seconds": 5.10361558,
+  "aggregate_end_to_end_tokens_per_second": 12.457977233075159,
+  "all_checks_passed": false,
+  "evaluation_exit_code": 1,
+  "model_lock": {
+    "repository": "Qwen/Qwen3-1.7B-GGUF",
+    "revision": "90862c4b9d2787eaed51d12237eafdfe7c5f6077",
+    "filename": "Qwen3-1.7B-Q8_0.gguf",
+    "sha256": "061b54daade076b5d3362dac252678d17da8c68f07560be70818cace6590cb1a",
+    "size_bytes": 1834426016,
+    "license": "Apache-2.0",
+    "license_url": "https://huggingface.co/Qwen/Qwen3-1.7B-GGUF/resolve/90862c4b9d2787eaed51d12237eafdfe7c5f6077/LICENSE",
+    "license_sha256": "5de36594c10839788a8c589443a8ef9d8b8d17c65a1b5807206ae037fc36c6bd",
+    "purpose": "Official 1.7B evaluation candidate following weak 0.6B semantic/tool results; Q8_0 is the available official GGUF"
+  },
+  "llama_version": "version: 0.7.0-dev (build 1, commit c7fc509)\nbuilt with GNU 14.2.0 for Linux x86_64",
+  "cloud_runtime": {
+    "server_context": 4096,
+    "server_threads": 4,
+    "server_parallel": 1,
+    "load_seconds": 0.8371058789998642,
+    "resource_sample_interval_seconds": 0.1,
+    "gpu": "N/A; CPU-only build",
+    "hardware_scope": "Cloud, not target CachyOS hardware",
+    "sampled_peak_server_rss_bytes": 2554507264,
+    "server_cpu_seconds": 230.26,
+    "server_average_cpu_percent_one_core": 387.05949356117975,
+    "resource_scope": "llama-server during load + evaluation; sampled RSS may miss short peaks",
+    "samples": 591
+  }
+}

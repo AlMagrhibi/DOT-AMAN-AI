@@ -46,7 +46,7 @@ func New(endpoint string) (*HTTP, error) {
 		return nil, err
 	}
 	dial := &net.Dialer{Timeout: 5 * time.Second}
-	tr := &http.Transport{Proxy: nil, MaxConnsPerHost: 2, ResponseHeaderTimeout: 30 * time.Second, DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
+	tr := &http.Transport{Proxy: nil, MaxConnsPerHost: 2, DisableKeepAlives: true, ResponseHeaderTimeout: 30 * time.Second, DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
 		h, _, err := net.SplitHostPort(addr)
 		if err != nil {
 			return nil, err
@@ -135,7 +135,9 @@ type completion struct {
 }
 
 func payload(m []Message, max int) map[string]any {
-	return map[string]any{"messages": m, "max_tokens": max, "temperature": 0.2, "chat_template_kwargs": map[string]any{"enable_thinking": false}}
+	// Security answers should be reproducible: tool planning is already
+	// deterministic and regular answers must not vary between identical runs.
+	return map[string]any{"messages": m, "max_tokens": max, "temperature": 0.0, "chat_template_kwargs": map[string]any{"enable_thinking": false}}
 }
 func (h *HTTP) chat(ctx context.Context, m []Message, max int, extra map[string]any) (Response, error) {
 	if max < 1 || max > 32768 {

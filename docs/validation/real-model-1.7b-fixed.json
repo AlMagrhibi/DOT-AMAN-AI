@@ -1,0 +1,184 @@
+{
+  "scope": "Codex Cloud real local GGUF smoke/benchmark; small sample, not target-device performance or comprehensive model quality",
+  "model": "/workspace/models/Qwen3-1.7B-Q8_0.gguf",
+  "date_utc": "2026-10-22T08:52:07Z",
+  "settings": {
+    "latency_percentiles": "nearest rank",
+    "max_output": 96,
+    "quality_rubric": "language presence plus lexical least-privilege access/minimum evidence; manual semantic review still required",
+    "repetitions": 3,
+    "stream": true,
+    "temperature": 0.2,
+    "thinking": false,
+    "warmup": "one excluded English completion; server prefix cache may remain enabled"
+  },
+  "samples": [
+    {
+      "name": "english",
+      "prompt": "In English, explain least privilege in two short sentences.",
+      "text": "Least privilege is a security principle that ensures users and processes have only the minimum level of access necessary to perform their tasks. It prevents unauthorized actions by limiting permissions to what is strictly required.",
+      "output_tokens": 38,
+      "input_tokens": 180,
+      "seconds": 5.261646732,
+      "ttft_seconds": 2.856105035,
+      "end_to_end_tokens_per_second": 7.222073608418757,
+      "passed": true
+    },
+    {
+      "name": "arabic",
+      "prompt": "اشرح بالعربية مبدأ أقل امتياز في جملتين قصيرتين.",
+      "text": "الإقل امتياز هو مبدأ يُستخدم في تحليل البيانات لتحديد المدخلات التي تؤدي إلى نتائج محددة، وغالباً ما يُستخدم في تحليل البيانات الكبيرة لتحديد المدخلات التي تؤدي إلى نتائج محددة.",
+      "output_tokens": 71,
+      "input_tokens": 189,
+      "seconds": 5.0815429,
+      "ttft_seconds": 0.584231103,
+      "end_to_end_tokens_per_second": 13.972134329516338,
+      "passed": false,
+      "error": "least-privilege concept rubric missing; requires manual semantic review"
+    },
+    {
+      "name": "english",
+      "prompt": "In English, explain least privilege in two short sentences.",
+      "text": "Least privilege is a security principle that ensures users and processes have only the minimum level of access necessary to perform their tasks. It prevents unauthorized actions by limiting permissions to what is strictly required.",
+      "output_tokens": 38,
+      "input_tokens": 180,
+      "seconds": 2.891349559,
+      "ttft_seconds": 0.523783902,
+      "end_to_end_tokens_per_second": 13.142651631905293,
+      "passed": true
+    },
+    {
+      "name": "arabic",
+      "prompt": "اشرح بالعربية مبدأ أقل امتياز في جملتين قصيرتين.",
+      "text": "الإقل امتياز هو مبدأ يُطبق في نظام التشغيل لضمان أن كل عملية تُنفذ بسرعة كافية دون تأثر بالوقت المخصص للوظائف الأخرى.",
+      "output_tokens": 46,
+      "input_tokens": 189,
+      "seconds": 3.025749654,
+      "ttft_seconds": 0.561660861,
+      "end_to_end_tokens_per_second": 15.202844008984227,
+      "passed": false,
+      "error": "least-privilege concept rubric missing; requires manual semantic review"
+    },
+    {
+      "name": "english",
+      "prompt": "In English, explain least privilege in two short sentences.",
+      "text": "Least privilege is a security principle that ensures users and processes have only the minimum level of access necessary to perform their tasks. It prevents unauthorized actions by limiting permissions to what is strictly required.",
+      "output_tokens": 38,
+      "input_tokens": 180,
+      "seconds": 2.922438256,
+      "ttft_seconds": 0.530047506,
+      "end_to_end_tokens_per_second": 13.002841008525314,
+      "passed": true
+    },
+    {
+      "name": "arabic",
+      "prompt": "اشرح بالعربية مبدأ أقل امتياز في جملتين قصيرتين.",
+      "text": "الإقل امتياز هو مبدأ يُطبق في نظام التشغيل لضمان أن كل عملية تُنفذ بسرعة كافية دون تأثر بالوقت المخصص لها.",
+      "output_tokens": 43,
+      "input_tokens": 189,
+      "seconds": 3.316926173,
+      "ttft_seconds": 0.59303967,
+      "end_to_end_tokens_per_second": 12.96380979173515,
+      "passed": false,
+      "error": "least-privilege concept rubric missing; requires manual semantic review"
+    }
+  ],
+  "checks": [
+    {
+      "name": "warmup",
+      "passed": true,
+      "detail": "<nil>"
+    },
+    {
+      "name": "schema_0",
+      "passed": true,
+      "detail": "calls=[{system_info {}}] error=<nil>"
+    },
+    {
+      "name": "schema_1",
+      "passed": true,
+      "detail": "calls=[{system_info {}}] error=<nil>"
+    },
+    {
+      "name": "schema_2",
+      "passed": true,
+      "detail": "calls=[{system_info {}}] error=<nil>"
+    },
+    {
+      "name": "schema_3",
+      "passed": true,
+      "detail": "calls=[{system_info {}}] error=<nil>"
+    },
+    {
+      "name": "schema_4",
+      "passed": true,
+      "detail": "calls=[{system_info {}}] error=<nil>"
+    },
+    {
+      "name": "schema_5",
+      "passed": true,
+      "detail": "calls=[{system_info {}}] error=<nil>"
+    },
+    {
+      "name": "schema_selection",
+      "passed": true,
+      "detail": "valid=6 correct=6 total=6; small smoke set, not a global 95% claim"
+    },
+    {
+      "name": "stream_cancellation",
+      "passed": true,
+      "detail": "chunks=1 error=context canceled"
+    },
+    {
+      "name": "rag_grounded_answer",
+      "passed": true,
+      "detail": "answer=The synthetic KEYSTONE service listens on TCP port 43871. This is evaluation data, not a real vulnerability.\n\nالمراجع المسترجعة (لا تعني التحقق من كل ادعاء):\n[keystone] fixture:keystone error=<nil>"
+    },
+    {
+      "name": "session_restart",
+      "passed": true,
+      "detail": "messages=2 error=<nil>"
+    },
+    {
+      "name": "reviewed_memory_recall",
+      "passed": true,
+      "detail": "answer=The synthetic project codename is Cedar-Falcon-728.\n\nالمراجع المسترجعة (لا تعني التحقق من كل ادعاء):\n[keystone] fixture:keystone error=<nil>"
+    },
+    {
+      "name": "agent_real_system_info",
+      "passed": true,
+      "detail": "tools=[{system_info Linux 6.18.55 x86_64 GNU/Linux\n  2.147024ms} {system_info Linux 6.18.55 x86_64 GNU/Linux\n  1.747491ms} {system_info Linux 6.18.55 x86_64 GNU/Linux\n  1.560003ms} {system_info Linux 6.18.55 x86_64 GNU/Linux\n  3.36491ms}] error=<nil>"
+    }
+  ],
+  "latency_p50_seconds": 3.025749654,
+  "latency_p95_seconds": 5.261646732,
+  "aggregate_end_to_end_tokens_per_second": 12.177965440766465,
+  "all_checks_passed": false,
+  "evaluation_exit_code": 1,
+  "model_lock": {
+    "repository": "Qwen/Qwen3-1.7B-GGUF",
+    "revision": "90862c4b9d2787eaed51d12237eafdfe7c5f6077",
+    "filename": "Qwen3-1.7B-Q8_0.gguf",
+    "sha256": "061b54daade076b5d3362dac252678d17da8c68f07560be70818cace6590cb1a",
+    "size_bytes": 1834426016,
+    "license": "Apache-2.0",
+    "license_url": "https://huggingface.co/Qwen/Qwen3-1.7B-GGUF/resolve/90862c4b9d2787eaed51d12237eafdfe7c5f6077/LICENSE",
+    "license_sha256": "5de36594c10839788a8c589443a8ef9d8b8d17c65a1b5807206ae037fc36c6bd",
+    "purpose": "Official 1.7B evaluation candidate following weak 0.6B semantic/tool results; Q8_0 is the available official GGUF"
+  },
+  "llama_version": "version: 0.7.0-dev (build 1, commit c7fc509)\nbuilt with GNU 14.2.0 for Linux x86_64",
+  "cloud_runtime": {
+    "server_context": 4096,
+    "server_threads": 4,
+    "server_parallel": 1,
+    "load_seconds": 0.8372922070011555,
+    "resource_sample_interval_seconds": 0.1,
+    "gpu": "N/A; CPU-only build",
+    "hardware_scope": "Cloud, not target CachyOS hardware",
+    "sampled_peak_server_rss_bytes": 2566889472,
+    "server_cpu_seconds": 254.34,
+    "server_average_cpu_percent_one_core": 386.03502839143226,
+    "resource_scope": "llama-server during load + evaluation; sampled RSS may miss short peaks",
+    "samples": 655
+  }
+}

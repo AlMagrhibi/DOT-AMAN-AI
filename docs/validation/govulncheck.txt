@@ -2,7 +2,7 @@ Fetching vulnerabilities from the database...
 
 Checking the code against the vulnerabilities...
 
-The package pattern matched the following 13 root packages:
+The package pattern matched the following 14 root packages:
   github.com/AlMagrhibi/DOT-AMAN-AI/internal/config
   github.com/AlMagrhibi/DOT-AMAN-AI/internal/tools
   github.com/AlMagrhibi/DOT-AMAN-AI/internal/model
@@ -12,6 +12,7 @@ The package pattern matched the following 13 root packages:
   github.com/AlMagrhibi/DOT-AMAN-AI/internal/memory
   github.com/AlMagrhibi/DOT-AMAN-AI/internal/metrics
   github.com/AlMagrhibi/DOT-AMAN-AI/internal/app
+  github.com/AlMagrhibi/DOT-AMAN-AI/cmd/dotaman-eval
   github.com/AlMagrhibi/DOT-AMAN-AI/internal/evaluation
   github.com/AlMagrhibi/DOT-AMAN-AI/internal/reporting
   github.com/AlMagrhibi/DOT-AMAN-AI/internal/tui

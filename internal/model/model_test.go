@@ -24,6 +24,15 @@ func TestHTTPArabicAndStream(t *testing.T) {
 			return
 		}
 		b, _ := io.ReadAll(r.Body)
+		var payload struct {
+			Temperature float64 `json:"temperature"`
+		}
+		if err := json.Unmarshal(b, &payload); err != nil {
+			t.Error(err)
+		}
+		if payload.Temperature != 0 {
+			t.Fatalf("regular completion must be deterministic, temperature=%v", payload.Temperature)
+		}
 		if strings.Contains(string(b), `"stream":true`) {
 			fmt.Fprint(w, "data: {\"choices\":[{\"delta\":{\"content\":\"أمان\"}}]}\n\ndata: [DONE]\n\n")
 			return

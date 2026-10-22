@@ -1,0 +1,60 @@
+[
+  {
+    "name": "bilingual",
+    "thinking": false,
+    "prompt": "اشرح بالعربية مبدأ Least Privilege في أمن Linux.",
+    "seconds": 33.26215778599726,
+    "message": {
+      "role": "assistant",
+      "content": "الLeast Privilege (LP) هو مبدأ أمني ينص على أن المستخدم أو البرنامج يجب أن يحصل على **الحقول الأدنى الممكنة** من الموارد والصلاحيات لإنجاز المهام المطلوبة. في أمن Linux، يعني هذا أن المستخدمين والبرامج تُعطى صلاحيات فقط ما يكفي لإنجاز المهام، ولا يتم تخصيص صلاحيات إضافية.\n\n### مثال على مبدأ Least Privilege في Linux:\n\n- **مستخدم معتاد** (مثل: المستخدم \"root\") يحصل على صلاحيات كاملة (الوصول إلى جميع الملفات، التحكم في النظام، إلخ).\n- **مستخدم عادي** (مثل: المستخدم \"user1\") يحصل على صلاحيات فقط لفتح ملفات معينة أو إجراء مهام محددة.\n\n### كيف يتم تطبيقه في Linux؟\n\n1. **الحسابات (Users)**: تُعطى حسابات المستخدمين صلاحيات محددة فقط.\n2. **الصلاحيات (Permissions)**: تُستخدم الأدوات مثل `chmod` و`chown` لتحديد الصلاحيات.\n3. **البرامج (Applications)**: تُعطى البرامج صلاحيات فقط ما يكفي لإنجاز المهام، ولا تُمنح صلاحيات إضافية.\n4. **النظام (System)**: تُستخدم ميزات مثل `sudo` لمنح الصلاحيات مؤقتًا لبعض المهام فقط.\n\n### مثال تطبيقي:\n\nإذا كنت ترغب في إضافة ملف جديد إلى نظامك، يمكنك:\n- استخدام المستخدم \"user1\" لفتح الملف.\n- لا تمنح له صلاحيات إضافية (مثل: إضافة ملفات أو حذف الملفات).\n\n### مثال استخدام `sudo`:\n\n```bash\nsudo nano /path/to/file\n```\n\nهذا يمنح المستخدم \"user1\" الصلاحيات المؤقتة لفتح الملف، ولا يمنحه صلاحيات إضافية.\n\n### الخلاصة:\n\nالLeast Privilege هو مبدأ أمني ضروري لحماية النظام من التهديدات، حيث يُقلل من مساحة الخطر من خلال تخصيص الصلا"
+    },
+    "usage": {
+      "completion_tokens": 512,
+      "prompt_tokens": 46,
+      "total_tokens": 558,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "finish_reason": "length"
+  },
+  {
+    "name": "grounded",
+    "thinking": false,
+    "prompt": "المرجع: Principle of Least Privilege means granting each user/process only the minimum access permissions required for its task. هذا مرجع موثوق للتجربة فقط. اشرح بالعربية مبدأ أقل امتياز باستخدام المرجع.",
+    "seconds": 24.885829708997335,
+    "message": {
+      "role": "assistant",
+      "content": "مبدأ **القليل من الامتياز** (Principle of Least Privilege) هو مفهوم مُهم في الأمن السيبراني يهدف إلى تقليل المخاطر المرتبطة بالوصول غير المصرح به إلى الموارد أو البيانات. \n\n### ما يعنيه المبدأ:\nيُقصد بتطبيق هذا المبدأ أن **كل مستخدم أو عملية تُمنح فقط الامتياز الذي يُحتاجه لإنجاز مهامه**، وليُمنع إعطاؤه المزيد من الامتياز من غير الحاجة. هذا يقلل من مساحة الضعف التي قد تُستخدم لتنفيذ هجمات أو اختراقات.\n\n### أمثلة على التطبيق:\n- **المستخدم المُدرّب** يُمنح فقط الوصول إلى الملفات والبيانات التي تُستخدم في تدريبه، وليس للوصول إلى البيانات الحساسة.\n- **البرنامج المُستخدم** يُمنح فقط القدرة على تنفيذ المهام المُحددة له، وليس للوصول إلى الموارد النظامية أو الملفات الخاصة.\n- **النظام المُدارة** تُمنح فقط الامتياز الذي يُمكنها أن تُستخدمه لإنجاز المهام المُطلوبة، وليس أكثر.\n\n### لماذا هو مفيد؟\n- يقلل من مخاطر الاختراق أو التلاعب بالبيانات.\n- يُحافظ على سرية البيانات وسلامتها.\n- يُقلل من احتمالية تطوير هجمات من خلال استخدام موارد غير مُحترفة.\n\n### في النهاية:\nالمرجع يُظهر أن **القليل من الامتياز** هو مبدأ أساسي في تطوير أنظمة الأمان، ويعتبر مفتاحًا لحماية الأنظمة من الهجمات السيبرانية."
+    },
+    "usage": {
+      "completion_tokens": 410,
+      "prompt_tokens": 85,
+      "total_tokens": 495,
+      "prompt_tokens_details": {
+        "cached_tokens": 22
+      }
+    },
+    "finish_reason": "stop"
+  },
+  {
+    "name": "thinking",
+    "thinking": true,
+    "prompt": "اشرح بالعربية مبدأ أقل امتياز في أمن Linux في جملتين قصيرتين.",
+    "seconds": 15.684749508000095,
+    "message": {
+      "role": "assistant",
+      "content": "يُطبق مبدأ أقل امتياز في Linux حيث يُعطى المستخدمين فقط الوصول المطلوب لإنجاز مهامهم، مما يقلل من مخاطر الوصول غير المطلوب. هذا المبدأ يُحافظ على أمان النظام من خلال تجنب التحكم في الوصول غير الضروري.",
+      "reasoning_content": "Okay, the user is asking for an explanation of the principle of least privilege in Linux in two short sentences in Arabic. Let me start by recalling what least privilege means. It's a security concept where users and processes are given the minimum level of access necessary to perform their tasks. \n\nFirst, I need to make sure I understand the key points: minimal access, specific permissions, and the purpose of preventing unauthorized actions. Then, I have to translate that into two concise sentences in Arabic. \n\nThe first sentence should explain that the principle ensures users have only the permissions they need. The second should mention that this prevents unauthorized access and reduces security risks. I need to check the terminology to ensure it's accurate. Words like \"الوصول غير المطلوب\" for unauthorized access and \"الحماية\" for security. Also, make sure the sentences are clear and each covers a distinct aspect of the principle. Let me put that together now.\n"
+    },
+    "usage": {
+      "completion_tokens": 265,
+      "prompt_tokens": 51,
+      "total_tokens": 316,
+      "prompt_tokens_details": {
+        "cached_tokens": 22
+      }
+    },
+    "finish_reason": "stop"
+  }
+]

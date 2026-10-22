@@ -30,8 +30,8 @@ func TestWorkflowPersistenceAndModes(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			if mode == "auto" && len(out.Results) != 4 {
-				t.Fatal("step limit", len(out.Results))
+			if mode == "auto" && len(out.Results) != 1 {
+				t.Fatal("duplicate diagnostic should execute once", len(out.Results))
 			}
 			if mode != "auto" && len(out.Results) != 0 {
 				t.Fatal("unexpected execution")

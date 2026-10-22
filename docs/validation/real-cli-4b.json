@@ -1,0 +1,13 @@
+{
+  "scope": "Real Cloud CLI smoke against local loopback llama-server; synthetic prompt only",
+  "date_utc": "2026-10-22T09:12:00Z",
+  "model": "Qwen3-4B-Q4_K_M.gguf",
+  "doctor": "passed; SQLite WAL/FTS5 ready and local model reported",
+  "command": "bin/dotamanai-codex -json chat 'اشرح بالعربية مبدأ أقل امتياز في جملتين قصيرتين.'",
+  "response_language": "Arabic",
+  "response_contains_least_privilege_and_minimum_access": true,
+  "completion_tokens": 71,
+  "citations": [],
+  "weights_committed": false,
+  "note": "The executable was rebuilt from the current source before this check; Cloud timing is not target-device timing."
+}

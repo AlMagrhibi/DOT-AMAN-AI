@@ -81,7 +81,7 @@ func run(endpoint string, runs int) error {
 	if strings.Contains(strings.ToLower(info), "fixture") || strings.Contains(strings.ToLower(info), "mock") {
 		return fmt.Errorf("fixture model refused")
 	}
-	r := report{Scope: "Codex Cloud real local GGUF smoke/benchmark; small sample, not target-device performance or comprehensive model quality", Model: info, Date: time.Now().UTC().Format(time.RFC3339), Settings: map[string]any{"repetitions": runs, "max_output": 96, "temperature": 0.2, "thinking": false, "stream": true, "latency_percentiles": "nearest rank", "warmup": "one excluded English completion; server prefix cache may remain enabled", "quality_rubric": "language presence plus lexical least-privilege access/minimum evidence; manual semantic review still required"}}
+	r := report{Scope: "Codex Cloud real local GGUF smoke/benchmark; small sample, not target-device performance or comprehensive model quality", Model: info, Date: time.Now().UTC().Format(time.RFC3339), Settings: map[string]any{"repetitions": runs, "max_output": 96, "temperature": 0.0, "thinking": false, "stream": true, "latency_percentiles": "nearest rank", "warmup": "one excluded English completion; server prefix cache may remain enabled", "quality_rubric": "language presence plus lexical least-privilege access/minimum evidence; manual semantic review still required"}}
 	add := func(name string, ok bool, detail string) { r.Checks = append(r.Checks, check{name, ok, detail}) }
 	_, err = p.Complete(ctx, "Reply with READY.", 16)
 	add("warmup", err == nil, fmt.Sprint(err))
@@ -105,7 +105,7 @@ func run(endpoint string, runs int) error {
 			lower := strings.ToLower(text)
 			concept := false
 			if q.arabic {
-				for _, w := range []string{"صلاح", "وصول", "أذون", "اذون"} {
+				for _, w := range []string{"صلاح", "صلاحيات", "وصول", "أذون", "اذون", "امتياز"} {
 					if strings.Contains(lower, w) {
 						concept = true
 					}
@@ -197,6 +197,10 @@ func run(endpoint string, runs int) error {
 	add("session_restart", e == nil && len(messages) == 2, fmt.Sprintf("messages=%d error=%v", len(messages), e))
 	o, e = a.Run(ctx, id, "What is the synthetic project codename?", nil, nil)
 	add("reviewed_memory_recall", e == nil && strings.Contains(o.Text, "Cedar-Falcon-728"), fmt.Sprintf("answer=%s error=%v", o.Text, e))
+	arabic, arabicErr := a.Run(ctx, "", "اشرح بالعربية مبدأ أقل امتياز في جملتين قصيرتين.", nil, nil)
+	arabicAccess := strings.Contains(arabic.Text, "صلاح") || strings.Contains(arabic.Text, "صلاحيات") || strings.Contains(arabic.Text, "وصول") || strings.Contains(arabic.Text, "أذون") || strings.Contains(arabic.Text, "امتياز")
+	arabicMinimum := strings.Contains(arabic.Text, "أقل") || strings.Contains(arabic.Text, "الحد الأدنى") || strings.Contains(arabic.Text, "ضرور")
+	add("app_arabic_terminology", arabicErr == nil && arabicAccess && arabicMinimum, fmt.Sprintf("answer=%s error=%v", arabic.Text, arabicErr))
 	a.Config.Mode = "auto"
 	o, e = a.Run(ctx, "", "Use system_info once to report the real local kernel and architecture. Do not read files or use other tools.", nil, nil)
 	executed := false
@@ -205,7 +209,7 @@ func run(endpoint string, runs int) error {
 			executed = true
 		}
 	}
-	add("agent_real_system_info", e == nil && executed, fmt.Sprintf("tools=%v error=%v", o.Results, e))
+	add("agent_real_system_info", e == nil && executed && len(o.Results) == 1, fmt.Sprintf("tools=%v error=%v", o.Results, e))
 	times := []float64{}
 	tokens := 0
 	seconds := 0.0

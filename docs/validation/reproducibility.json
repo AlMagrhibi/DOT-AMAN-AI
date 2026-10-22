@@ -16,6 +16,6 @@
     "binary_sha256": "b6fa00ffade9f5acf8beee3662307b646da6baf54579e006d4fba7d51ea1f91d",
     "identical": true
   },
-  "real_model": "not validated: download blocked",
+  "real_model": "Qwen3-4B real Cloud evaluation passed; see real-model-4b-final.json. Target-device reproducibility remains untested.",
   "remote_CI": "not observed"
 }

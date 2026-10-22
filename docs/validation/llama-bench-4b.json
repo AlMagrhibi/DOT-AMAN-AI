@@ -1,0 +1,21 @@
+{
+  "scope": "Codex Cloud llama-bench CPU baseline; this is separate from end-to-end app latency and not target-device performance",
+  "date_utc": "2026-10-22T09:08:05Z",
+  "command": "llama-bench -m /workspace/models/Qwen3-4B-Q4_K_M.gguf -p 128 -n 64 -t 4 -r 3 -o json",
+  "llama_commit": "c7fc5094179bf8a9c73c18593db714f8da41a402",
+  "cpu": "AMD EPYC 9V74 80-Core Processor",
+  "gpu": "N/A; CPU-only build",
+  "threads": 4,
+  "prompt_128_tokens": {
+    "avg_tokens_per_second": 42.230677,
+    "stddev_tokens_per_second": 3.400243,
+    "samples_tokens_per_second": [38.6796, 45.4568, 42.5556]
+  },
+  "generation_64_tokens": {
+    "avg_tokens_per_second": 14.039198,
+    "stddev_tokens_per_second": 2.872264,
+    "samples_tokens_per_second": [15.6221, 15.7718, 10.7237]
+  },
+  "model_size_bytes_reported": 2491323904,
+  "model_parameters": 4022468096
+}

@@ -1,6 +1,6 @@
 # التشغيل المحلي على CachyOS / Arch Linux
 
-التطبيق قيد التحقق؛ لا توجد أوزان نموذج ضمن المستودع. الاستدلال الحقيقي ما زال غير مختبر بسبب حظر تنزيل GGUF في بيئة Cloud. لا تستخدمه كمرجع أمني مستقل دون مراجعة الأدلة.
+التطبيق قابل للبناء والتقييم. شُغّل `llama-server` في Cloud على Qwen3-4B Q4_K_M الرسمي بعد التحقق من الحجم والبصمة والترخيص؛ الأوزان لا تُخزّن في المستودع. نتائج Cloud لا تمثل سرعة أو ذاكرة جهازك المحلي، ولا تجعل النموذج مرجعًا أمنيًا مستقلًا.
 
 ## البناء
 
@@ -23,21 +23,21 @@ SQLite uses CGO and bundled SQLite: GCC is needed at build time. Runtime does no
 ./scripts/build-llama.sh "$HOME/.cache/dotamanai-codex/llama.cpp"
 ```
 
-Pinned llama.cpp commit: `c7fc5094179bf8a9c73c18593db714f8da41a402`, MIT. CPU build uses four build jobs and no embedded Web UI. The build is verified in Cloud; real model startup remains pending.
+Pinned llama.cpp commit: `c7fc5094179bf8a9c73c18593db714f8da41a402`, MIT. CPU build uses four build jobs and no embedded Web UI. The build and real model startup were verified in Cloud.
 
-Reference model: official Qwen3-1.7B Q4_K_M; Qwen3-0.6B Q4_K_M may be used for a smaller Cloud smoke test. Check the publisher model card/license and exact filename, immutable revision, and LFS SHA-256 first. No model fingerprint is claimed because weights have not been downloaded.
+Recommended Cloud/reference candidate: official Qwen3-4B Q4_K_M, locked in `configs/model-lock-4b.json`. The smaller Qwen3-0.6B and Qwen3-1.7B locks remain available for comparison. Check the publisher model card/license and exact filename, immutable revision, and LFS SHA-256 before every local download. The model files stay outside Git.
 
-Optional explicit download (replace placeholders with actual publisher metadata; do not run them literally):
+Optional explicit download (use the exact publisher URL, revision and digest from a model-lock file):
 
 ```sh
 ./scripts/download-model.sh 'https://huggingface.co/Qwen/MODEL/resolve/REVISION/FILE.gguf' "$HOME/.local/share/dotamanai-codex/models/model.gguf" PUBLISHER_SHA256
 ```
 
-The script verifies SHA-256 and retains HTTPS verification. It never runs automatically. A model up to 2 GiB is allowed by that helper; larger downloads require deliberate review. Keep the model card/license with your local model.
+The script verifies SHA-256 and retains HTTPS verification. It never runs automatically. The helper defaults to a 2 GiB limit; set `MODEL_DOWNLOAD_MAX_BYTES` explicitly for a reviewed larger file such as Qwen3-4B (2.50 GB decimal). Keep the model card/license with your local model.
 
 ```sh
 export LLAMA_SERVER="$HOME/.cache/dotamanai-codex/llama.cpp/build/bin/llama-server"
-export MODEL_PATH="$HOME/.local/share/dotamanai-codex/models/model.gguf"
+export MODEL_PATH="$HOME/.local/share/dotamanai-codex/models/Qwen3-4B-Q4_K_M.gguf"
 # Terminal 1; keep it running:
 ./scripts/start-model.sh
 # Terminal 2:
@@ -82,16 +82,16 @@ TUI: `/help`, `/new`, `/sessions`, `/resume ID`, `/delete-session ID`, `/mode an
 3. Test KDE Wayland copy, mixed Arabic/code rendering, resize, long sessions and confirm/deny.
 4. Verify pacman, systemctl, journalctl and ip diagnostics on Arch; Cloud is Debian without a running systemd manager.
 5. Disconnect external networking while retaining loopback: chat, stored search, sessions, tools and report exports must work. Do not invoke manual sync while offline.
-6. Inspect `KNOWN_ISSUES.md`; complete real-model checks and rerun the current vulnerability scanner before relying on the release.
+6. Inspect `KNOWN_ISSUES.md`; Cloud real-model and vulnerability checks are recorded, but rerun them after changing the model or llama.cpp before relying on a local release.
 
 ## Reproduce the real Cloud evaluation
 
-Development-only, after obtaining the exact official model in `configs/model-lock.json` and enabling its download CDN. `govulncheck v1.9.0` is the supported scanner for the pinned Go toolchain.
+Development-only, after obtaining the exact official model in `configs/model-lock-4b.json`. `govulncheck v1.9.0` is the supported scanner for the pinned Go toolchain.
 
 ```sh
 export LLAMA_SERVER=/workspace/llama.cpp/build/bin/llama-server
-export MODEL_PATH=/workspace/models/Qwen3-0.6B-Q8_0.gguf
-python3 tests/run_real_model.py --runs 3 --output docs/validation/real-model.json
+export MODEL_PATH=/workspace/models/Qwen3-4B-Q4_K_M.gguf
+python3 tests/run_real_model.py --model-lock configs/model-lock-4b.json --runs 3 --output docs/validation/real-model-4b-final.json
 ```
 
-The wrapper verifies the full model digest/size, refuses an occupied port, starts/stops only its own server, runs actual Go provider/app evaluation and preserves failed outcomes. Reports contain only synthetic test data. The official small model is a Cloud smoke target, not evidence of Qwen1.7B quality or target-device performance. This command is **not yet real-model verified** while CDN access is denied. The standalone `go run -tags sqlite_fts5 ./cmd/dotaman-eval` can target a separately started numeric-loopback server; it has no mock fallback.
+The wrapper verifies the full model digest/size, refuses an occupied port, starts/stops only its own server, runs actual Go provider/app evaluation and preserves failed outcomes. Reports contain only synthetic RAG/memory fixture data; language and tool calls use the real GGUF. The final Cloud evidence is `docs/validation/real-model-4b-final.json`; it does not predict target-device performance. The standalone `go run -tags sqlite_fts5 ./cmd/dotaman-eval` can target a separately started numeric-loopback server; it has no mock fallback.
