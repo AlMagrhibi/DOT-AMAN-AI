@@ -1,0 +1,161 @@
+// Package storage persists original conversations in private local SQLite files.
+package storage
+
+import (
+	"context"
+	"crypto/rand"
+	"database/sql"
+	"encoding/hex"
+	"fmt"
+	_ "github.com/mattn/go-sqlite3"
+	"os"
+	"path/filepath"
+	"time"
+)
+
+type Store struct{ DB *sql.DB }
+type Message struct {
+	ID      int64  `json:"id"`
+	Session string `json:"session"`
+	Role    string `json:"role"`
+	Content string `json:"content"`
+	Created string `json:"created"`
+}
+type Session struct {
+	ID    string `json:"id"`
+	Title string `json:"title"`
+}
+
+func Open(dir string) (*Store, error) {
+	if err := os.MkdirAll(dir, 0700); err != nil {
+		return nil, err
+	}
+	if err := os.Chmod(dir, 0700); err != nil {
+		return nil, err
+	}
+	path := filepath.Join(dir, "aman.sqlite")
+	f, err := os.OpenFile(path, os.O_CREATE|os.O_RDWR, 0600)
+	if err != nil {
+		return nil, err
+	}
+	if err = f.Close(); err != nil {
+		return nil, err
+	}
+	if err = os.Chmod(path, 0600); err != nil {
+		return nil, err
+	}
+	db, err := sql.Open("sqlite3", path)
+	if err != nil {
+		return nil, err
+	}
+	db.SetMaxOpenConns(1)
+	s := &Store{db}
+	if err = s.migrate(); err != nil {
+		db.Close()
+		return nil, err
+	}
+	return s, nil
+}
+func (s *Store) migrate() error {
+	if _, err := s.DB.Exec(`PRAGMA journal_mode=WAL; PRAGMA foreign_keys=ON; PRAGMA busy_timeout=5000;`); err != nil {
+		return err
+	}
+	tx, err := s.DB.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+	var version int
+	if err = tx.QueryRow(`PRAGMA user_version`).Scan(&version); err != nil {
+		return err
+	}
+	if version > 1 {
+		return fmt.Errorf("database schema %d is newer than supported", version)
+	}
+	if _, err = tx.Exec(`CREATE TABLE IF NOT EXISTS sessions(id TEXT PRIMARY KEY,title TEXT NOT NULL,created TEXT NOT NULL);
+ CREATE TABLE IF NOT EXISTS messages(id INTEGER PRIMARY KEY,session TEXT NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,role TEXT NOT NULL CHECK(role IN ('user','assistant','system')),content TEXT NOT NULL,created TEXT NOT NULL);
+ CREATE INDEX IF NOT EXISTS messages_session ON messages(session,id);
+ CREATE TABLE IF NOT EXISTS audit(id INTEGER PRIMARY KEY,session TEXT,tool TEXT,status TEXT,detail TEXT,created TEXT NOT NULL);
+ PRAGMA user_version=1;`); err != nil {
+		return err
+	}
+	return tx.Commit()
+}
+func (s *Store) Close() error { return s.DB.Close() }
+func (s *Store) NewSession(ctx context.Context, title string) (string, error) {
+	b := make([]byte, 16)
+	if _, err := rand.Read(b); err != nil {
+		return "", err
+	}
+	id := hex.EncodeToString(b)
+	_, err := s.DB.ExecContext(ctx, `INSERT INTO sessions VALUES(?,?,?)`, id, title, time.Now().UTC().Format(time.RFC3339Nano))
+	return id, err
+}
+func (s *Store) Sessions(ctx context.Context) ([]Session, error) {
+	rows, err := s.DB.QueryContext(ctx, `SELECT id,title FROM sessions ORDER BY created DESC`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	out := []Session{}
+	for rows.Next() {
+		var x Session
+		if err = rows.Scan(&x.ID, &x.Title); err != nil {
+			return nil, err
+		}
+		out = append(out, x)
+	}
+	return out, rows.Err()
+}
+func (s *Store) Add(ctx context.Context, session, role, content string) error {
+	if len(content) > 1<<20 {
+		return fmt.Errorf("message too large")
+	}
+	_, err := s.DB.ExecContext(ctx, `INSERT INTO messages(session,role,content,created) VALUES(?,?,?,?)`, session, role, content, time.Now().UTC().Format(time.RFC3339Nano))
+	return err
+}
+func (s *Store) Messages(ctx context.Context, id string) ([]Message, error) {
+	rows, err := s.DB.QueryContext(ctx, `SELECT id,session,role,content,created FROM messages WHERE session=? ORDER BY id`, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	out := []Message{}
+	for rows.Next() {
+		var m Message
+		if err = rows.Scan(&m.ID, &m.Session, &m.Role, &m.Content, &m.Created); err != nil {
+			return nil, err
+		}
+		out = append(out, m)
+	}
+	return out, rows.Err()
+}
+func (s *Store) Edit(ctx context.Context, session string, id int64, text string) error {
+	r, err := s.DB.ExecContext(ctx, `UPDATE messages SET content=? WHERE session=? AND id=?`, text, session, id)
+	return changed(r, err)
+}
+func (s *Store) DeleteMessage(ctx context.Context, session string, id int64) error {
+	r, err := s.DB.ExecContext(ctx, `DELETE FROM messages WHERE session=? AND id=?`, session, id)
+	return changed(r, err)
+}
+func (s *Store) DeleteSession(ctx context.Context, id string) error {
+	r, err := s.DB.ExecContext(ctx, `DELETE FROM sessions WHERE id=?`, id)
+	return changed(r, err)
+}
+func changed(r sql.Result, err error) error {
+	if err != nil {
+		return err
+	}
+	n, err := r.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if n != 1 {
+		return fmt.Errorf("record not found")
+	}
+	return nil
+}
+func (s *Store) Audit(ctx context.Context, session, tool, status, detail string) error {
+	_, err := s.DB.ExecContext(ctx, `INSERT INTO audit(session,tool,status,detail,created) VALUES(?,?,?,?,?)`, session, tool, status, detail, time.Now().UTC().Format(time.RFC3339Nano))
+	return err
+}

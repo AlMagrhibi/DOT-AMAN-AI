@@ -2,8 +2,8 @@
 
 | Phase | State | Evidence |
 |---|---|---|
-| 0 Foundation | Partial | Specification, architecture, threat model; toolchain and push verification in progress |
-| 1 Go core | Deferred | Not implemented yet |
+| 0 Foundation | Complete | e7fb02a pushed to main; official Go archive digest verified |
+| 1 Go core | Complete | Config validation, SQLite WAL/FTS5, persistence/isolation/edit/delete tests; check.sh and doctor passed |
 | 2 Tools | Deferred | Not implemented yet |
 | 3 Provider | Deferred | Not implemented yet |
 | 4 llama.cpp | Deferred | Not implemented yet |
