@@ -12,6 +12,7 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/glamour"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/x/ansi"
 	"os/exec"
@@ -116,6 +117,12 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.last = v.out
 		m.session = v.out.Session
 		m.append("\n")
+		if renderer, e := glamour.NewTermRenderer(glamour.WithStandardStyle("dark"), glamour.WithWordWrap(max(10, m.width-4))); e == nil {
+			if rendered, e := renderer.Render(m.transcript); e == nil {
+				m.view.SetContent(rendered)
+				m.view.GotoBottom()
+			}
+		}
 		m.status = Stats(v.out)
 		return m, nil
 	case tea.KeyMsg:

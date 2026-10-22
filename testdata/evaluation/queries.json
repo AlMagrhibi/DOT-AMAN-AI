@@ -1,0 +1,302 @@
+[
+  {
+    "query": "prepared statements",
+    "expected": "sql",
+    "language": "en"
+  },
+  {
+    "query": "حقن SQL",
+    "expected": "sql",
+    "language": "ar"
+  },
+  {
+    "query": "parameterized queries",
+    "expected": "sql",
+    "language": "en"
+  },
+  {
+    "query": "XSS output encoding",
+    "expected": "xss",
+    "language": "en"
+  },
+  {
+    "query": "ترميز المخرجات",
+    "expected": "xss",
+    "language": "ar"
+  },
+  {
+    "query": "browser XSS",
+    "expected": "xss",
+    "language": "en"
+  },
+  {
+    "query": "DNS rebinding",
+    "expected": "ssrf",
+    "language": "en"
+  },
+  {
+    "query": "SSRF private addresses",
+    "expected": "ssrf",
+    "language": "en"
+  },
+  {
+    "query": "العناوين الداخلية",
+    "expected": "ssrf",
+    "language": "ar"
+  },
+  {
+    "query": "SameSite cookies",
+    "expected": "csrf",
+    "language": "en"
+  },
+  {
+    "query": "CSRF tokens",
+    "expected": "csrf",
+    "language": "en"
+  },
+  {
+    "query": "حماية CSRF",
+    "expected": "csrf",
+    "language": "ar"
+  },
+  {
+    "query": "SSH root login",
+    "expected": "ssh",
+    "language": "en"
+  },
+  {
+    "query": "public-key authentication",
+    "expected": "ssh",
+    "language": "en"
+  },
+  {
+    "query": "مفاتيح SSH",
+    "expected": "ssh",
+    "language": "ar"
+  },
+  {
+    "query": "file permissions",
+    "expected": "permissions",
+    "language": "en"
+  },
+  {
+    "query": "اقل امتياز",
+    "expected": "permissions",
+    "language": "ar"
+  },
+  {
+    "query": "صلاحيات الملفات",
+    "expected": "permissions",
+    "language": "ar"
+  },
+  {
+    "query": "systemctl failed",
+    "expected": "systemd",
+    "language": "en"
+  },
+  {
+    "query": "ادارة الخدمات",
+    "expected": "systemd",
+    "language": "ar"
+  },
+  {
+    "query": "failed units",
+    "expected": "systemd",
+    "language": "en"
+  },
+  {
+    "query": "pacman packages",
+    "expected": "pacman",
+    "language": "en"
+  },
+  {
+    "query": "توقيع الحزم",
+    "expected": "pacman",
+    "language": "ar"
+  },
+  {
+    "query": "Arch packages",
+    "expected": "pacman",
+    "language": "en"
+  },
+  {
+    "query": "TLS certificates",
+    "expected": "tls",
+    "language": "en"
+  },
+  {
+    "query": "شهادات TLS",
+    "expected": "tls",
+    "language": "ar"
+  },
+  {
+    "query": "certificate verification",
+    "expected": "tls",
+    "language": "en"
+  },
+  {
+    "query": "tested restoration",
+    "expected": "backup",
+    "language": "en"
+  },
+  {
+    "query": "النسخ الاحتياطية",
+    "expected": "backup",
+    "language": "ar"
+  },
+  {
+    "query": "offline copies",
+    "expected": "backup",
+    "language": "en"
+  },
+  {
+    "query": "incident logs",
+    "expected": "logging",
+    "language": "en"
+  },
+  {
+    "query": "كلمات المرور السجلات",
+    "expected": "logging",
+    "language": "ar"
+  },
+  {
+    "query": "preserve timestamps",
+    "expected": "logging",
+    "language": "en"
+  },
+  {
+    "query": "nftables rules",
+    "expected": "firewall",
+    "language": "en"
+  },
+  {
+    "query": "الجدار الناري",
+    "expected": "firewall",
+    "language": "ar"
+  },
+  {
+    "query": "inbound ports",
+    "expected": "firewall",
+    "language": "en"
+  },
+  {
+    "query": "multi-factor authentication",
+    "expected": "mfa",
+    "language": "en"
+  },
+  {
+    "query": "المصادقة متعددة العوامل",
+    "expected": "mfa",
+    "language": "ar"
+  },
+  {
+    "query": "stolen credential",
+    "expected": "mfa",
+    "language": "en"
+  },
+  {
+    "query": "session isolation",
+    "expected": "memory",
+    "language": "en"
+  },
+  {
+    "query": "عزل الجلسات",
+    "expected": "memory",
+    "language": "ar"
+  },
+  {
+    "query": "conversation leakage",
+    "expected": "memory",
+    "language": "en"
+  },
+  {
+    "query": "CVE-2025-1234",
+    "expected": "cve",
+    "language": "en"
+  },
+  {
+    "query": "synthetic identifier",
+    "expected": "cve",
+    "language": "en"
+  },
+  {
+    "query": "معرف تجريبي",
+    "expected": "cve",
+    "language": "ar"
+  },
+  {
+    "query": "token exposure",
+    "expected": "secrets",
+    "language": "en"
+  },
+  {
+    "query": "رفع الاسرار",
+    "expected": "secrets",
+    "language": "ar"
+  },
+  {
+    "query": "source control secrets",
+    "expected": "secrets",
+    "language": "en"
+  },
+  {
+    "query": "process groups",
+    "expected": "timeouts",
+    "language": "en"
+  },
+  {
+    "query": "مهلة التنفيذ",
+    "expected": "timeouts",
+    "language": "ar"
+  },
+  {
+    "query": "runtime cancellation",
+    "expected": "timeouts",
+    "language": "en"
+  },
+  {
+    "query": "audit rejected arguments",
+    "expected": "audit",
+    "language": "en"
+  },
+  {
+    "query": "سجل التدقيق",
+    "expected": "audit",
+    "language": "ar"
+  },
+  {
+    "query": "executed commands",
+    "expected": "audit",
+    "language": "en"
+  },
+  {
+    "query": "document hashes",
+    "expected": "rag",
+    "language": "en"
+  },
+  {
+    "query": "مصادر الاسترجاع",
+    "expected": "rag",
+    "language": "ar"
+  },
+  {
+    "query": "source citations",
+    "expected": "rag",
+    "language": "en"
+  },
+  {
+    "query": "loopback inference",
+    "expected": "offline",
+    "language": "en"
+  },
+  {
+    "query": "الاستدلال المحلي",
+    "expected": "offline",
+    "language": "ar"
+  },
+  {
+    "query": "no telemetry",
+    "expected": "offline",
+    "language": "en"
+  }
+]

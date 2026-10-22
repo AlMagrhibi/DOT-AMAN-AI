@@ -1,0 +1,142 @@
+[
+  {
+    "id": "sql",
+    "source": "synthetic-evaluation",
+    "url": "fixture:sql",
+    "title": "sql",
+    "text": "Parameterized queries and prepared statements separate SQL code from values. الاستعلامات المعلّمة تمنع حقن SQL."
+  },
+  {
+    "id": "xss",
+    "source": "synthetic-evaluation",
+    "url": "fixture:xss",
+    "title": "xss",
+    "text": "Contextual output encoding prevents XSS. ترميز المخرجات يقلل XSS في المتصفح."
+  },
+  {
+    "id": "ssrf",
+    "source": "synthetic-evaluation",
+    "url": "fixture:ssrf",
+    "title": "ssrf",
+    "text": "SSRF mitigations reject private addresses and validate DNS rebinding and redirects. رفض العناوين الداخلية يحد من SSRF."
+  },
+  {
+    "id": "csrf",
+    "source": "synthetic-evaluation",
+    "url": "fixture:csrf",
+    "title": "csrf",
+    "text": "CSRF tokens and SameSite cookies protect state-changing browser requests. رموز CSRF لحماية الطلبات."
+  },
+  {
+    "id": "ssh",
+    "source": "synthetic-evaluation",
+    "url": "fixture:ssh",
+    "title": "ssh",
+    "text": "SSH root login should be disabled. Use public-key authentication and a dedicated account. مفاتيح SSH ومراجعة دخول root."
+  },
+  {
+    "id": "permissions",
+    "source": "synthetic-evaluation",
+    "url": "fixture:permissions",
+    "title": "permissions",
+    "text": "Linux file permissions and least privilege constrain access. صلاحيات الملفات ومبدأ أقل امتياز."
+  },
+  {
+    "id": "systemd",
+    "source": "synthetic-evaluation",
+    "url": "fixture:systemd",
+    "title": "systemd",
+    "text": "systemd manages services. systemctl failed lists failed units. إدارة الخدمات ومراجعة فشل systemd."
+  },
+  {
+    "id": "pacman",
+    "source": "synthetic-evaluation",
+    "url": "fixture:pacman",
+    "title": "pacman",
+    "text": "pacman manages Arch packages. Review signature verification before installing packages. تحقق توقيع الحزم في Arch."
+  },
+  {
+    "id": "tls",
+    "source": "synthetic-evaluation",
+    "url": "fixture:tls",
+    "title": "tls",
+    "text": "TLS certificates validate server identity. Never disable certificate verification. شهادات TLS والتحقق من هوية الخادم."
+  },
+  {
+    "id": "backup",
+    "source": "synthetic-evaluation",
+    "url": "fixture:backup",
+    "title": "backup",
+    "text": "Backups need tested restoration and offline copies. اختبر استعادة النسخ الاحتياطية."
+  },
+  {
+    "id": "logging",
+    "source": "synthetic-evaluation",
+    "url": "fixture:logging",
+    "title": "logging",
+    "text": "Centralize incident logs and preserve timestamps. لا تضع كلمات المرور في السجلات."
+  },
+  {
+    "id": "firewall",
+    "source": "synthetic-evaluation",
+    "url": "fixture:firewall",
+    "title": "firewall",
+    "text": "A firewall restricts inbound ports. Review nftables rules. قواعد الجدار الناري وتقييد المنافذ."
+  },
+  {
+    "id": "mfa",
+    "source": "synthetic-evaluation",
+    "url": "fixture:mfa",
+    "title": "mfa",
+    "text": "Multi-factor authentication reduces stolen credential risk. المصادقة متعددة العوامل تحمي الحسابات."
+  },
+  {
+    "id": "memory",
+    "source": "synthetic-evaluation",
+    "url": "fixture:memory",
+    "title": "memory",
+    "text": "Session isolation prevents conversation leakage. عزل الجلسات يحمي المحادثات."
+  },
+  {
+    "id": "cve",
+    "source": "synthetic-evaluation",
+    "url": "fixture:cve",
+    "title": "cve",
+    "text": "CVE-2025-1234 is a synthetic test identifier, not a claim of an actual vulnerability. معرف تجريبي فقط."
+  },
+  {
+    "id": "secrets",
+    "source": "synthetic-evaluation",
+    "url": "fixture:secrets",
+    "title": "secrets",
+    "text": "Store secrets outside source control. Prevent token exposure in Git commits. تجنب رفع الأسرار إلى Git."
+  },
+  {
+    "id": "timeouts",
+    "source": "synthetic-evaluation",
+    "url": "fixture:timeouts",
+    "title": "timeouts",
+    "text": "Bound process runtime and kill process groups on cancellation. حدد مهلة التنفيذ وألغ العمليات التابعة."
+  },
+  {
+    "id": "audit",
+    "source": "synthetic-evaluation",
+    "url": "fixture:audit",
+    "title": "audit",
+    "text": "Audit records distinguish rejected arguments from executed commands. سجل التدقيق يفرق الرفض والتنفيذ."
+  },
+  {
+    "id": "rag",
+    "source": "synthetic-evaluation",
+    "url": "fixture:rag",
+    "title": "rag",
+    "text": "Retrieval needs source citations and document hashes. مصادر الاسترجاع وبصمة الوثيقة وإسناد الاقتباس."
+  },
+  {
+    "id": "offline",
+    "source": "synthetic-evaluation",
+    "url": "fixture:offline",
+    "title": "offline",
+    "text": "Loopback inference keeps prompts local with no telemetry. الاستدلال المحلي دون اتصال خارجي."
+  }
+]

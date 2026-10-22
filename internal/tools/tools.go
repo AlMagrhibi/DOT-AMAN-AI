@@ -83,6 +83,24 @@ func Validate(c Call) (Args, error) {
 	if string(bytes.TrimSpace(c.Arguments)) == "null" {
 		return a, fmt.Errorf("arguments must be object")
 	}
+	var raw map[string]json.RawMessage
+	if err := json.Unmarshal(c.Arguments, &raw); err != nil || raw == nil {
+		return a, fmt.Errorf("arguments must be an object")
+	}
+	if c.Name != "read_file" && c.Name != "list_dir" && len(raw) != 0 {
+		return a, fmt.Errorf("tool takes no arguments")
+	}
+	for k, v := range raw {
+		if k != "path" && k != "limit" {
+			return a, fmt.Errorf("unknown argument")
+		}
+		if string(v) == "null" {
+			return a, fmt.Errorf("null argument")
+		}
+	}
+	if _, ok := raw["limit"]; ok && a.Limit == 0 {
+		return a, fmt.Errorf("limit must be positive")
+	}
 	if c.Name == "read_file" || c.Name == "list_dir" {
 		if a.Path == "" || len(a.Path) > 4096 || filepath.IsAbs(a.Path) || !filepath.IsLocal(a.Path) || strings.ContainsRune(a.Path, 0) {
 			return a, fmt.Errorf("path must be relative and confined")

@@ -87,3 +87,22 @@ func FuzzSuggestions(f *testing.F) {
 	f.Add(`{"calls":[]}`)
 	f.Fuzz(func(t *testing.T, s string) { _, _ = ParseSuggestions(s) })
 }
+
+func TestInferenceIgnoresExternalProxy(t *testing.T) {
+	t.Setenv("HTTP_PROXY", "http://192.0.2.1:9")
+	t.Setenv("HTTPS_PROXY", "http://192.0.2.1:9")
+	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { fmt.Fprint(w, `{"status":"ok"}`) }))
+	defer s.Close()
+	h, err := New(s.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = h.Health(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	for _, u := range []string{"http://example.com", "http://169.254.169.254", "http://10.0.0.1", "https://127.0.0.1"} {
+		if _, err = New(u); err == nil {
+			t.Fatal("external endpoint accepted", u)
+		}
+	}
+}

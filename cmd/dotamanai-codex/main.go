@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/AlMagrhibi/DOT-AMAN-AI/internal/app"
 	"github.com/AlMagrhibi/DOT-AMAN-AI/internal/config"
+	"github.com/AlMagrhibi/DOT-AMAN-AI/internal/evaluation"
 	"github.com/AlMagrhibi/DOT-AMAN-AI/internal/model"
 	"github.com/AlMagrhibi/DOT-AMAN-AI/internal/tools"
 	"github.com/AlMagrhibi/DOT-AMAN-AI/internal/tui"
@@ -48,6 +49,12 @@ func run(ctx context.Context, args []string) error {
 	switch f.Arg(0) {
 	case "":
 		return tui.Run(a, *session)
+	case "evaluate":
+		v, err := evaluation.Run(ctx, f.Arg(1))
+		if err != nil {
+			return err
+		}
+		return encode(v)
 	case "doctor":
 		if err = p.Health(ctx); err != nil {
 			return fmt.Errorf("SQLite ready; local llama-server unavailable: %w", err)
@@ -58,6 +65,12 @@ func run(ctx context.Context, args []string) error {
 		}
 		fmt.Printf("Dot Aman AI · SQLite WAL/FTS5 ready · mode=%s · local model=%s\n", c.Mode, info)
 		return nil
+	case "summarize":
+		messages, err := a.Store.Messages(ctx, f.Arg(1))
+		if err != nil {
+			return err
+		}
+		return a.Memory.Compress(ctx, f.Arg(1), messages, p, c.Context)
 	case "sessions":
 		v, err := a.Store.Sessions(ctx)
 		if err != nil {

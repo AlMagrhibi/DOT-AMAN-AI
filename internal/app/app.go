@@ -100,15 +100,23 @@ func (a *App) Run(ctx context.Context, session, prompt string, approve func(tool
 	for _, f := range facts {
 		fmt.Fprintf(&refs, "Reviewed memory [%d] source=%s: %s\n", f.ID, f.Source, f.Text)
 	}
+	summaries, err := a.Memory.SummaryContext(ctx, session)
+	if err != nil {
+		return out, err
+	}
+	refs.WriteString(summaries)
 	messages, err := contextmanager.Build(System, prompt, hist, refs.String(), a.Config.Context, a.Config.MaxOutput)
 	if err != nil {
 		return out, err
 	}
 	if a.Config.Mode != "analysis" {
-		for step := 0; step < 4; step++ {
+		remaining := 4
+		for step := 0; step < 4 && remaining > 0; step++ {
 			schema, _ := json.Marshal(tools.Specs())
-			planning := append([]model.Message{}, messages...)
-			planning = append(planning, model.Message{Role: "user", Content: "Suggest only necessary read-only tools from this registry; empty calls when sufficient evidence. Root-relative file paths only. Registry: " + string(schema)})
+			planning, err := contextmanager.Build(System, "Suggest only necessary read-only tools; empty calls when sufficient evidence. Root-relative paths. Registry: "+string(schema), messages[1:], "", a.Config.Context, 512)
+			if err != nil {
+				return out, err
+			}
 			calls, err := a.Model.Suggest(ctx, planning)
 			if err != nil {
 				return out, fmt.Errorf("tool planning: %w", err)
@@ -120,6 +128,10 @@ func (a *App) Run(ctx context.Context, session, prompt string, approve func(tool
 				return out, fmt.Errorf("too many tool suggestions")
 			}
 			for _, c := range calls {
+				if remaining == 0 {
+					break
+				}
+				remaining--
 				if _, err = tools.Validate(c); err != nil {
 					_, auditErr := a.Tools.Execute(ctx, session, c)
 					return out, fmt.Errorf("invalid suggestion: %w; audit: %v", err, auditErr)
