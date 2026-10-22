@@ -1,10 +1,11 @@
 {
   "remote": "https://github.com/AlMagrhibi/DOT-AMAN-AI.git",
-  "commit": "4ce71ee658319954772e31ae0282bfd1da060300",
+  "commit": "b61936a86c77b6e98c6e66f10da1a1adfb74b3cf",
   "checkout": "temporary fresh HTTPS clone outside the repository",
   "go_mod_verify": "passed",
   "scripts_check": "passed",
   "build": "passed",
   "pty_fixture": "passed",
-  "scope": "Cloud toolchain and local HTTP fixture; no GGUF weights or target device"
+  "scope": "Cloud toolchain and local HTTP fixture; no GGUF weights or target device",
+  "latest_run": "go mod verify, scripts/check.sh, tagged build and PTY fixture passed after the final no-evidence assertion fix"
 }
