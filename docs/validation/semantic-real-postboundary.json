@@ -1,0 +1,143 @@
+{
+  "scope": "real local nomic-embed-text-v1.5 GGUF semantic retrieval; independent synthetic corpus",
+  "endpoint": "http://127.0.0.1:8082",
+  "documents": 10,
+  "queries": 12,
+  "recall_at_5": 1,
+  "arabic_queries": 2,
+  "arabic_hits": 2,
+  "embeddings_indexed": 10,
+  "mean_latency_ms": 32.61625,
+  "cases": [
+    {
+      "error": "",
+      "expected": "firewall",
+      "language": "en",
+      "latency_ms": 26.464,
+      "query": "What controls packets crossing a trust boundary?",
+      "retrieved": [
+        "firewall"
+      ]
+    },
+    {
+      "error": "",
+      "expected": "least-privilege",
+      "language": "en",
+      "latency_ms": 29.491,
+      "query": "How can privileges be limited to only what a job needs?",
+      "retrieved": [
+        "logging",
+        "least-privilege"
+      ]
+    },
+    {
+      "error": "",
+      "expected": "mfa",
+      "language": "en",
+      "latency_ms": 38.821,
+      "query": "What login defense asks for another proof besides a password?",
+      "retrieved": [
+        "mfa"
+      ]
+    },
+    {
+      "error": "",
+      "expected": "backup",
+      "language": "en",
+      "latency_ms": 33.228,
+      "query": "What helps restore data after ransomware?",
+      "retrieved": [
+        "backup"
+      ]
+    },
+    {
+      "error": "",
+      "expected": "tls",
+      "language": "en",
+      "latency_ms": 29.316,
+      "query": "How is information protected while traveling across a network?",
+      "retrieved": [
+        "firewall",
+        "secrets",
+        "tls"
+      ]
+    },
+    {
+      "error": "",
+      "expected": "patching",
+      "language": "en",
+      "latency_ms": 27.326,
+      "query": "What fixes publicly known software weaknesses?",
+      "retrieved": [
+        "patching"
+      ]
+    },
+    {
+      "error": "",
+      "expected": "logging",
+      "language": "en",
+      "latency_ms": 26.1,
+      "query": "Where can investigators review past security events?",
+      "retrieved": [
+        "logging"
+      ]
+    },
+    {
+      "error": "",
+      "expected": "sql",
+      "language": "en",
+      "latency_ms": 25.549,
+      "query": "How do applications keep values from becoming SQL commands?",
+      "retrieved": [
+        "sql"
+      ]
+    },
+    {
+      "error": "",
+      "expected": "xss",
+      "language": "en",
+      "latency_ms": 26.676,
+      "query": "How do websites stop injected browser scripts?",
+      "retrieved": [
+        "xss"
+      ]
+    },
+    {
+      "error": "",
+      "expected": "secrets",
+      "language": "en",
+      "latency_ms": 29.618,
+      "query": "Where should API keys be kept so they are not published?",
+      "retrieved": [
+        "patching",
+        "secrets"
+      ]
+    },
+    {
+      "error": "",
+      "expected": "firewall",
+      "language": "ar",
+      "latency_ms": 54.67,
+      "query": "ما الذي يمنع مرور الحزم بين المناطق الموثوقة وغير الموثوقة؟",
+      "retrieved": [
+        "mfa",
+        "backup",
+        "secrets",
+        "firewall"
+      ]
+    },
+    {
+      "error": "",
+      "expected": "least-privilege",
+      "language": "ar",
+      "latency_ms": 44.132,
+      "query": "كيف نعطي المستخدم أقل صلاحيات لازمة؟",
+      "retrieved": [
+        "mfa",
+        "secrets",
+        "least-privilege"
+      ]
+    }
+  ],
+  "passed": true
+}

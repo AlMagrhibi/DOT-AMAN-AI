@@ -1,0 +1,68 @@
+{
+  "source_before": [
+    {
+      "id": "cisa-kev",
+      "url": "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json",
+      "license": "US government public information; verify third-party notices",
+      "last_sync": "",
+      "document_count": 0,
+      "status": "registered",
+      "error": ""
+    },
+    {
+      "id": "owasp",
+      "url": "https://raw.githubusercontent.com/OWASP/CheatSheetSeries/master/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.md",
+      "license": "CC-BY-SA-4.0",
+      "last_sync": "",
+      "document_count": 0,
+      "status": "registered",
+      "error": ""
+    }
+  ],
+  "first_sync": "ok",
+  "second_sync": "ok",
+  "source_after": [
+    {
+      "id": "cisa-kev",
+      "url": "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json",
+      "license": "US government public information; verify third-party notices",
+      "last_sync": "2026-10-22T09:57:38Z",
+      "etag": "W/\"ec0ebf29c610041ebc8b08e890b6b842c03933faccc41de63146b1461c3fca0f\"",
+      "document_count": 1754,
+      "status": "synced",
+      "error": ""
+    },
+    {
+      "id": "owasp",
+      "url": "https://raw.githubusercontent.com/OWASP/CheatSheetSeries/master/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.md",
+      "license": "CC-BY-SA-4.0",
+      "last_sync": "",
+      "document_count": 0,
+      "status": "registered",
+      "error": ""
+    }
+  ],
+  "history": [
+    {
+      "source": "cisa-kev",
+      "status": "not-modified",
+      "detail": "retained last valid version",
+      "created": "2026-10-22T09:57:38Z"
+    },
+    {
+      "source": "cisa-kev",
+      "status": "synced",
+      "detail": "1754 documents from https://raw.githubusercontent.com/cisagov/kev-data/main/known_exploited_vulnerabilities.json",
+      "created": "2026-10-22T09:57:38Z"
+    }
+  ],
+  "search_ids": [
+    "CVE-2024-43461",
+    "CVE-2024-41713",
+    "CVE-2024-43093",
+    "CVE-2024-38094",
+    "CVE-2024-29988"
+  ],
+  "duration_ms": 1416,
+  "passed": true
+}
