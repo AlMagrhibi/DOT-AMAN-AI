@@ -237,6 +237,9 @@ func (a *App) Run(ctx context.Context, session, prompt string, approve func(tool
 		return out, err
 	}
 	out.Text = response.Text
+	if len(hits) == 0 && !strings.Contains(strings.ToLower(out.Text), "لا يوجد دليل") && !strings.Contains(strings.ToLower(out.Text), "no evidence") {
+		out.Text += "\n\nتنبيه: لم يتم استرجاع دليل من قاعدة المعرفة لهذا الطلب؛ هذه إجابة تحليلية غير مؤكدة وتتطلب تحققًا من أداة أو مصدر موثوق."
+	}
 	out.Usage = response.Usage
 	out.InferenceDuration = response.Duration
 	out.TTFT = response.TTFT
