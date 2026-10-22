@@ -75,3 +75,31 @@ func TestNaturalQuestionRetrieval(t *testing.T) {
 		t.Fatalf("natural question lost matching reference: %v %v", hits, err)
 	}
 }
+
+func TestSourceRegistryMetadata(t *testing.T) {
+	s, err := storage.Open(t.TempDir())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer s.Close()
+	k, err := New(s.DB)
+	if err != nil {
+		t.Fatal(err)
+	}
+	sources, err := k.Sources(context.Background())
+	if err != nil || len(sources) < 15 {
+		t.Fatalf("source registry incomplete: %d %v", len(sources), err)
+	}
+	var found bool
+	for _, source := range sources {
+		if source.ID == "cisa-kev" {
+			found = true
+			if source.Format != "json" || source.MaxBytes != 8<<20 || source.FallbackURL == "" {
+				t.Fatalf("CISA metadata incomplete: %+v", source)
+			}
+		}
+	}
+	if !found {
+		t.Fatal("CISA source missing")
+	}
+}

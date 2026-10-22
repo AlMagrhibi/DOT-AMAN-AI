@@ -42,7 +42,10 @@ type Source struct {
 	ID            string `json:"id"`
 	URL           string `json:"url"`
 	FallbackURL   string `json:"fallback_url,omitempty"`
+	Format        string `json:"format"`
 	License       string `json:"license"`
+	MaxBytes      int64  `json:"max_bytes"`
+	Bytes         int64  `json:"bytes"`
 	LastSync      string `json:"last_sync"`
 	ETag          string `json:"etag,omitempty"`
 	LastModified  string `json:"last_modified,omitempty"`
@@ -60,21 +63,49 @@ type Index struct {
 }
 
 func New(db *sql.DB) (*Index, error) {
-	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS sources(id TEXT PRIMARY KEY,url TEXT NOT NULL,license TEXT NOT NULL,last_sync TEXT NOT NULL DEFAULT '',status TEXT NOT NULL DEFAULT 'registered',error TEXT NOT NULL DEFAULT '',fallback_url TEXT NOT NULL DEFAULT '',etag TEXT NOT NULL DEFAULT '',last_modified TEXT NOT NULL DEFAULT '',document_count INTEGER NOT NULL DEFAULT 0);
+	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS sources(id TEXT PRIMARY KEY,url TEXT NOT NULL,format TEXT NOT NULL DEFAULT 'unknown',license TEXT NOT NULL,last_sync TEXT NOT NULL DEFAULT '',status TEXT NOT NULL DEFAULT 'registered',error TEXT NOT NULL DEFAULT '',fallback_url TEXT NOT NULL DEFAULT '',etag TEXT NOT NULL DEFAULT '',last_modified TEXT NOT NULL DEFAULT '',document_count INTEGER NOT NULL DEFAULT 0,max_bytes INTEGER NOT NULL DEFAULT 8388608,bytes INTEGER NOT NULL DEFAULT 0);
  CREATE TABLE IF NOT EXISTS documents(id TEXT PRIMARY KEY,source TEXT NOT NULL,url TEXT NOT NULL,title TEXT NOT NULL,text TEXT NOT NULL,sha TEXT NOT NULL,fetched TEXT NOT NULL,published TEXT NOT NULL);
  CREATE TABLE IF NOT EXISTS document_versions(document TEXT,sha TEXT,text TEXT,fetched TEXT,PRIMARY KEY(document,sha));
  CREATE TABLE IF NOT EXISTS chunks(id INTEGER PRIMARY KEY,document TEXT NOT NULL REFERENCES documents(id) ON DELETE CASCADE,text TEXT NOT NULL);
  CREATE TABLE IF NOT EXISTS chunk_embeddings(chunk INTEGER PRIMARY KEY REFERENCES chunks(id) ON DELETE CASCADE,model TEXT NOT NULL,dimension INTEGER NOT NULL,vector BLOB NOT NULL,created TEXT NOT NULL);
  CREATE VIRTUAL TABLE IF NOT EXISTS chunks_fts USING fts5(normalized,chunk UNINDEXED);
  CREATE TABLE IF NOT EXISTS sync_history(id INTEGER PRIMARY KEY,source TEXT,status TEXT,detail TEXT,created TEXT);
- INSERT OR IGNORE INTO sources(id,url,license) VALUES('cisa-kev','https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json','US government public information; verify third-party notices'),('owasp','https://raw.githubusercontent.com/OWASP/CheatSheetSeries/master/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.md','CC-BY-SA-4.0');`)
+	INSERT OR IGNORE INTO sources(id,url,license) VALUES('cisa-kev','https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json','US government public information; verify third-party notices'),('owasp','https://raw.githubusercontent.com/OWASP/CheatSheetSeries/master/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.md','CC-BY-SA-4.0');`)
 	if err != nil {
 		return nil, err
 	}
-	for _, column := range []struct{ name, definition string }{{"fallback_url", "TEXT NOT NULL DEFAULT ''"}, {"etag", "TEXT NOT NULL DEFAULT ''"}, {"last_modified", "TEXT NOT NULL DEFAULT ''"}, {"document_count", "INTEGER NOT NULL DEFAULT 0"}} {
+	for _, column := range []struct{ name, definition string }{{"fallback_url", "TEXT NOT NULL DEFAULT ''"}, {"etag", "TEXT NOT NULL DEFAULT ''"}, {"last_modified", "TEXT NOT NULL DEFAULT ''"}, {"document_count", "INTEGER NOT NULL DEFAULT 0"}, {"format", "TEXT NOT NULL DEFAULT 'unknown'"}, {"max_bytes", "INTEGER NOT NULL DEFAULT 8388608"}, {"bytes", "INTEGER NOT NULL DEFAULT 0"}} {
 		if err = ensureColumn(db, "sources", column.name, column.definition); err != nil {
 			return nil, err
 		}
+	}
+	registry := []struct{ id, url, format, license string }{
+		{"cisa-kev", "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json", "json", "US government public information; verify third-party notices"},
+		{"owasp", "https://raw.githubusercontent.com/OWASP/CheatSheetSeries/master/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.md", "markdown", "CC-BY-SA-4.0"},
+		{"cve", "https://www.cve.org/", "html", "CVE Terms of Use"},
+		{"nvd", "https://nvd.nist.gov/", "json/html", "NIST public data; verify terms"},
+		{"epss", "https://api.first.org/data/v1/epss", "json", "FIRST EPSS terms"},
+		{"osv", "https://osv.dev/", "json", "OSV terms"},
+		{"go-vulndb", "https://vuln.go.dev/", "json", "Go vulnerability database terms"},
+		{"cwe", "https://cwe.mitre.org/", "html", "MITRE CWE terms"},
+		{"capec", "https://capec.mitre.org/", "html", "MITRE CAPEC terms"},
+		{"attack", "https://attack.mitre.org/", "html", "MITRE ATT&CK terms"},
+		{"owasp-wstg", "https://owasp.org/www-project-web-security-testing-guide/", "html", "CC-BY-SA-4.0"},
+		{"owasp-asvs", "https://asvs.owasp.org/", "html", "CC-BY-SA-4.0"},
+		{"arch-security", "https://security.archlinux.org/", "html", "Arch Linux terms"},
+		{"arch-wiki", "https://wiki.archlinux.org/", "html", "Arch Wiki terms"},
+		{"kernel-docs", "https://docs.kernel.org/", "html", "Linux kernel documentation license"},
+	}
+	for _, source := range registry {
+		if _, err = db.Exec(`INSERT OR IGNORE INTO sources(id,url,format,license,max_bytes) VALUES(?,?,?,?,?)`, source.id, source.url, source.format, source.license, 8<<20); err != nil {
+			return nil, err
+		}
+		if _, err = db.Exec(`UPDATE sources SET url=?,format=?,license=?,max_bytes=? WHERE id=?`, source.url, source.format, source.license, 8<<20, source.id); err != nil {
+			return nil, err
+		}
+	}
+	if _, err = db.Exec(`UPDATE sources SET fallback_url=? WHERE id='cisa-kev' AND fallback_url=''`, "https://raw.githubusercontent.com/cisagov/kev-data/main/known_exploited_vulnerabilities.json"); err != nil {
+		return nil, err
 	}
 	return &Index{DB: db}, nil
 }
@@ -460,7 +491,7 @@ func (i *Index) Import(ctx context.Context, path string) error {
 	return i.Put(ctx, Document{ID: "local:" + hex.EncodeToString(sum[:]), Source: "user-import", URL: "local:" + filepath.Base(path), Title: filepath.Base(path), Text: text})
 }
 func (i *Index) Sources(ctx context.Context) ([]Source, error) {
-	rows, err := i.DB.QueryContext(ctx, `SELECT id,url,fallback_url,license,last_sync,etag,last_modified,document_count,status,error FROM sources ORDER BY id`)
+	rows, err := i.DB.QueryContext(ctx, `SELECT id,url,fallback_url,format,license,max_bytes,bytes,last_sync,etag,last_modified,document_count,status,error FROM sources ORDER BY id`)
 	if err != nil {
 		return nil, err
 	}
@@ -468,7 +499,7 @@ func (i *Index) Sources(ctx context.Context) ([]Source, error) {
 	out := []Source{}
 	for rows.Next() {
 		var s Source
-		if err = rows.Scan(&s.ID, &s.URL, &s.FallbackURL, &s.License, &s.LastSync, &s.ETag, &s.LastModified, &s.DocumentCount, &s.Status, &s.Error); err != nil {
+		if err = rows.Scan(&s.ID, &s.URL, &s.FallbackURL, &s.Format, &s.License, &s.MaxBytes, &s.Bytes, &s.LastSync, &s.ETag, &s.LastModified, &s.DocumentCount, &s.Status, &s.Error); err != nil {
 			return nil, err
 		}
 		out = append(out, s)
@@ -549,7 +580,7 @@ func (i *Index) Sync(ctx context.Context, id string) error {
 			return err
 		}
 	}
-	_, err = tx.ExecContext(ctx, `UPDATE sources SET last_sync=?,etag=?,last_modified=?,document_count=?,status='synced',error='' WHERE id=?`, time.Now().UTC().Format(time.RFC3339), etag, modified, len(docs), id)
+	_, err = tx.ExecContext(ctx, `UPDATE sources SET last_sync=?,etag=?,last_modified=?,document_count=?,bytes=?,status='synced',error='' WHERE id=?`, time.Now().UTC().Format(time.RFC3339), etag, modified, len(docs), len(body), id)
 	if err != nil {
 		return err
 	}
