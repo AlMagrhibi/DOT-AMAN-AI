@@ -61,6 +61,8 @@ dotamanai-codex -json chat 'اشرح مبدأ أقل امتياز'
 dotamanai-codex sessions
 dotamanai-codex -session SESSION_ID chat 'نكمل'
 dotamanai-codex export-session SESSION_ID
+dotamanai-codex edit-message SESSION_ID MESSAGE_ID "النص المصحح"
+dotamanai-codex delete-message SESSION_ID MESSAGE_ID
 dotamanai-codex summarize SESSION_ID
 dotamanai-codex experiments SESSION_ID
 dotamanai-codex import ./explicit-file.md
@@ -73,7 +75,7 @@ dotamanai-codex sync cisa-kev
 
 Flags precede the command. Imported files are data, never commands. Plain text/Markdown/JSON/CSV/log/TOML/Go/shell text import is supported up to 2 MiB; text-based PDF and DOCX extraction is bounded to 16 MiB and tested. Scanned/image-only PDFs are rejected. Search uses lexical FTS5/BM25 and, when configured, local Nomic embeddings with Arabic normalization. Semantic indexing is explicit through `reindex-embeddings`; there is no automatic external download.
 
-TUI: `/help`, `/new`, `/sessions`, `/resume ID`, `/delete-session ID`, `/mode analysis|confirm|auto`, `/search WORDS`, `/import PATH`, `/sources`, `/remember TEXT`, `/facts`, `/correct ID TEXT`, `/forget ID`, `/experiments`, `/export`, `/stats`, `/copy`. PgUp/PgDown scroll, Ctrl+C cancels a request, Ctrl+Q quits. Terminal-dependent Arabic bidi behavior remains a target acceptance check. `/copy` requires local `wl-copy` (`wl-clipboard` package); it copies only on an explicit command. A clipboard substitute and PTY interaction are Cloud-tested; actual KDE/Wayland is not.
+TUI: `/help`, `/new`, `/sessions`, `/resume ID`, `/delete-session ID`, `/mode analysis|confirm|auto`, `/search WORDS`, `/import PATH`, `/sources`, `/remember TEXT`, `/facts`, `/correct ID TEXT`, `/forget ID`, `/edit ID TEXT`, `/delete-message ID`, `/experiments`, `/export`, `/stats`, `/copy`. `/resume` prints message IDs so an individual message can be corrected or deleted. PgUp/PgDown scroll, Ctrl+C cancels a request, Ctrl+Q quits. Terminal-dependent Arabic bidi behavior remains a target acceptance check. `/copy` requires local `wl-copy` (`wl-clipboard` package); it copies only on an explicit command. A clipboard substitute and PTY interaction are Cloud-tested; actual KDE/Wayland is not.
 
 `/remember` explicitly promotes user-provided memory with provenance. Reviewed project memory is available across sessions; episodic memory remains session-scoped. Summaries are labeled unverified, retain original message ranges, and are invalidated after source edits/deletions. Compression triggers automatically for long sessions and is also available through `summarize`; it does not train the model. Application history reads at most 64 recent messages for generation. Original messages remain stored and exportable. `/export` writes legacy JSON, structured `.security.json`, and Arabic Markdown. When a local Unicode TrueType font such as `ttf-dejavu` is installed, it also writes a PDF; set `DOTAMAN_PDF_FONT` to an explicit font path when needed. Without a font, the other formats remain successful and PDF is reported unavailable rather than silently producing broken Arabic glyphs.
 

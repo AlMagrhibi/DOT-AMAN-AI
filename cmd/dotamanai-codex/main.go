@@ -13,6 +13,7 @@ import (
 	"github.com/AlMagrhibi/DOT-AMAN-AI/internal/tui"
 	"os"
 	"os/signal"
+	"strconv"
 	"strings"
 	"syscall"
 )
@@ -89,6 +90,24 @@ func run(ctx context.Context, args []string) error {
 			return err
 		}
 		return encode(v)
+	case "edit-message":
+		if f.NArg() < 4 {
+			return fmt.Errorf("edit-message requires SESSION_ID MESSAGE_ID TEXT")
+		}
+		messageID, parseErr := strconv.ParseInt(f.Arg(2), 10, 64)
+		if parseErr != nil {
+			return fmt.Errorf("invalid message ID: %w", parseErr)
+		}
+		return a.Store.Edit(ctx, f.Arg(1), messageID, strings.Join(f.Args()[3:], " "))
+	case "delete-message":
+		if f.NArg() != 3 {
+			return fmt.Errorf("delete-message requires SESSION_ID MESSAGE_ID")
+		}
+		messageID, parseErr := strconv.ParseInt(f.Arg(2), 10, 64)
+		if parseErr != nil {
+			return fmt.Errorf("invalid message ID: %w", parseErr)
+		}
+		return a.Store.DeleteMessage(ctx, f.Arg(1), messageID)
 	case "delete-session":
 		return a.Store.DeleteSession(ctx, f.Arg(1))
 	case "import":
@@ -142,7 +161,7 @@ func run(ctx context.Context, args []string) error {
 		fmt.Println("Session:", o.Session)
 		return nil
 	default:
-		return fmt.Errorf("commands: doctor, chat TEXT, sessions, export-session ID, delete-session ID, import PATH, search QUERY, reindex-embeddings, sources, sync-history SOURCE, sync cisa-kev|owasp")
+		return fmt.Errorf("commands: doctor, chat TEXT, sessions, export-session ID, edit-message SESSION_ID MESSAGE_ID TEXT, delete-message SESSION_ID MESSAGE_ID, delete-session ID, import PATH, search QUERY, reindex-embeddings, sources, sync-history SOURCE, sync cisa-kev|owasp")
 	}
 }
 func main() {

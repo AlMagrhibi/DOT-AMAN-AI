@@ -26,6 +26,13 @@ def main():
             assert o['text'].startswith('أمان Linux fixture') and 'لم يتم استرجاع دليل' in o['text'] and o['usage']['completion_tokens']==4
             messages=json.loads(subprocess.run(base+['export-session',o['session']],check=True,capture_output=True).stdout)
             assert len(messages)==2 and messages[0]['content']=='اختبار Linux'
+            subprocess.run(base+['edit-message',o['session'],str(messages[0]['id']),'اختبار معدل'],check=True,capture_output=True)
+            edited=json.loads(subprocess.run(base+['export-session',o['session']],check=True,capture_output=True).stdout)
+            assert edited[0]['content']=='اختبار معدل'
+            subprocess.run(base+['edit-message',o['session'],str(messages[0]['id']),'اختبار Linux'],check=True,capture_output=True)
+            subprocess.run(base+['delete-message',o['session'],str(messages[1]['id'])],check=True,capture_output=True)
+            after_delete=json.loads(subprocess.run(base+['export-session',o['session']],check=True,capture_output=True).stdout)
+            assert len(after_delete)==1 and after_delete[0]['content']=='اختبار Linux'
             doc=pathlib.Path(td)/'fixture.md';doc.write_text('أَمَان Linux: least privilege and prepared statements.')
             subprocess.run(base+['import',str(doc)],check=True,capture_output=True)
             hits=json.loads(subprocess.run(base+['search','امان'],check=True,capture_output=True).stdout)
@@ -49,7 +56,7 @@ def main():
             finally:
                 if proc.poll() is None:proc.kill();proc.wait()
                 os.close(master)
-            result={'fixture':'local HTTP, not real model','cli_chat':'passed','session_restart_export':'passed','offline_import_arabic_search':'passed','pty_arabic_stream_resize_default':'passed','pty_stats_quit':'passed','real_wayland_clipboard':'unrun'}
+            result={'fixture':'local HTTP, not real model','cli_chat':'passed','session_restart_export':'passed','message_edit_delete':'passed','offline_import_arabic_search':'passed','pty_arabic_stream_resize_default':'passed','pty_stats_quit':'passed','real_wayland_clipboard':'unrun'}
             print(json.dumps(result,indent=2))
     finally:server.shutdown();server.server_close()
 if __name__=='__main__':main()

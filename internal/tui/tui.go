@@ -236,7 +236,7 @@ func (m *Model) command(text string) tea.Cmd {
 	}
 	switch name {
 	case "/help":
-		m.append("\n/help /new /sessions /resume ID /delete-session ID /mode analysis|confirm|auto\n/search WORDS /import PATH /sources /remember TEXT /facts /forget ID\n/correct ID TEXT /experiments /export /stats /copy · PgUp/PgDown scroll\n")
+		m.append("\n/help /new /sessions /resume ID /delete-session ID /mode analysis|confirm|auto\n/search WORDS /import PATH /sources /remember TEXT /facts /forget ID\n/correct ID TEXT /edit ID TEXT /delete-message ID /experiments /export /stats /copy · PgUp/PgDown scroll\n")
 	case "/new":
 		m.session = ""
 		m.transcript = ""
@@ -268,7 +268,7 @@ func (m *Model) command(text string) tea.Cmd {
 		m.session = arg
 		m.transcript = ""
 		for _, v := range x {
-			m.append(v.Role + ": " + v.Content + "\n")
+			m.append(fmt.Sprintf("[%d] %s: %s\n", v.ID, v.Role, v.Content))
 		}
 	case "/delete-session":
 		e := m.App.Store.DeleteSession(ctx, arg)
@@ -312,6 +312,23 @@ func (m *Model) command(text string) tea.Cmd {
 			e = m.App.Memory.Delete(ctx, m.session, id)
 		}
 		show("deleted", e)
+	case "/delete-message":
+		id, e := strconv.ParseInt(arg, 10, 64)
+		if e == nil {
+			e = m.App.Store.DeleteMessage(ctx, m.session, id)
+		}
+		show("deleted", e)
+	case "/edit":
+		p := strings.SplitN(arg, " ", 2)
+		if len(p) != 2 {
+			m.status = "/edit ID TEXT"
+			break
+		}
+		id, e := strconv.ParseInt(p[0], 10, 64)
+		if e == nil {
+			e = m.App.Store.Edit(ctx, m.session, id, p[1])
+		}
+		show("edited", e)
 	case "/correct":
 		p := strings.SplitN(arg, " ", 2)
 		if len(p) != 2 {
