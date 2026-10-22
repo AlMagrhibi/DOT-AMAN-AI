@@ -83,6 +83,9 @@ func TestHTTPEmbedderLoopbackAndResponseValidation(t *testing.T) {
 	if _, err = NewHTTPEmbedder("http://example.com"); err == nil {
 		t.Fatal("external endpoint accepted")
 	}
+	if _, err = NewHTTPEmbedder("http://192.168.1.1:8082"); err == nil {
+		t.Fatal("numeric non-loopback endpoint accepted")
+	}
 	if _, err = NewHTTPEmbedder(fmt.Sprintf("https://127.0.0.1:%s", strings.TrimPrefix(server.URL, "http://127.0.0.1:"))); err == nil {
 		t.Fatal("HTTPS endpoint accepted")
 	}

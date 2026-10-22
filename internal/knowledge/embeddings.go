@@ -31,7 +31,8 @@ func NewHTTPEmbedder(endpoint string) (*HTTPEmbedder, error) {
 	if err != nil || u.Scheme != "http" || u.User != nil || u.RawQuery != "" || u.Fragment != "" || (u.Path != "" && u.Path != "/") {
 		return nil, fmt.Errorf("embedding endpoint must be numeric HTTP loopback")
 	}
-	if net.ParseIP(u.Hostname()) == nil {
+	ip := net.ParseIP(u.Hostname())
+	if ip == nil || !ip.IsLoopback() {
 		return nil, fmt.Errorf("embedding endpoint must use a numeric loopback address")
 	}
 	dial := &net.Dialer{Timeout: 5 * time.Second}

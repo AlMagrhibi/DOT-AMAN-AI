@@ -54,7 +54,7 @@ Optional semantic retrieval uses a second local llama-server in embedding mode. 
 
 Without an explicit config the application uses `$XDG_DATA_HOME/dotamanai-codex`, falling back to `~/.local/share/dotamanai-codex`. Data directory mode is 0700 and database mode 0600. For a config, copy `configs/example.toml` to `~/.config/dotamanai-codex/config.toml`, replace **both absolute directories** with your own paths, and pass `-config PATH`. Config is intentionally loaded only when explicitly specified. Cache location for llama build above is `~/.cache/dotamanai-codex`.
 
-`root` is the sole file-tool scope; select a narrow directory. File tools confine symlinks, refuse special files and bound outputs. Diagnostic tools are read-only. No privileged repair or arbitrary shell command is implemented. Analysis is default; Confirm asks before each tool; Auto remains restricted to validated registered tools. CLI Confirm declines tools (use the TUI for interactive confirmation).
+`root` is the sole file-tool scope; select a narrow directory. File tools confine symlinks, refuse special files and bound outputs. Diagnostic tools are read-only; the only mutating actions are the explicitly named `service_restart` and `package_install` tools, with strict arguments and mode/approval controls. No arbitrary shell command is implemented. Analysis is default; Confirm asks before each tool; Auto remains restricted to validated registered tools. CLI Confirm declines tools (use the TUI for interactive confirmation).
 
 ```sh
 dotamanai-codex -json chat 'اشرح مبدأ أقل امتياز'
