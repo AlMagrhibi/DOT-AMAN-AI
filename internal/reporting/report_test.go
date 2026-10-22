@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"github.com/AlMagrhibi/DOT-AMAN-AI/internal/app"
+	"github.com/AlMagrhibi/DOT-AMAN-AI/internal/knowledge"
 	"github.com/AlMagrhibi/DOT-AMAN-AI/internal/tools"
 	"os"
 	"strings"
@@ -11,7 +12,7 @@ import (
 )
 
 func TestReportEvidenceAndPermissions(t *testing.T) {
-	o := app.Outcome{Session: "synthetic", Text: "نتيجة موثقة", Results: []tools.Result{{Name: "system_info", Output: "Linux"}}}
+	o := app.Outcome{Session: "synthetic", Text: "نتيجة موثقة", Results: []tools.Result{{Name: "system_info", Output: "Linux"}}, Citations: []knowledge.Hit{{ID: "CVE-2026-0001", Source: "cisa-kev", Title: "Example vulnerability", URL: "https://example.test/cve", Text: "verified source evidence", SHA256: "abc"}}}
 	p, err := Export(t.TempDir(), o)
 	if err != nil {
 		t.Fatal(err)
@@ -29,7 +30,7 @@ func TestReportEvidenceAndPermissions(t *testing.T) {
 		t.Fatal(err)
 	}
 	var report SecurityReport
-	if err = json.Unmarshal(structured, &report); err != nil || report.SchemaVersion != "1.0" || report.Language != "ar" || len(report.Evidence) != 1 || len(report.Limitations) == 0 {
+	if err = json.Unmarshal(structured, &report); err != nil || report.SchemaVersion != "1.0" || report.Language != "ar" || len(report.Evidence) != 1 || len(report.Findings) != 1 || report.Findings[0].CVE != "CVE-2026-0001" || report.Findings[0].KEV == nil || !*report.Findings[0].KEV || len(report.Limitations) == 0 {
 		t.Fatalf("structured report: %+v err=%v", report, err)
 	}
 	md, err := os.ReadFile(p + ".md")

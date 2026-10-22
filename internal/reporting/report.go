@@ -7,9 +7,13 @@ import (
 	"github.com/AlMagrhibi/DOT-AMAN-AI/internal/app"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 )
+
+var cveIDPattern = regexp.MustCompile(`(?i)\bCVE-\d{4}-\d{4,}\b`)
+var cweIDPattern = regexp.MustCompile(`(?i)\bCWE-\d+\b`)
 
 // Finding is evidence-first. Empty scoring fields mean that the source did
 // not provide a verified CVSS/EPSS value; the exporter never invents scores.
@@ -89,6 +93,20 @@ func Build(o app.Outcome) SecurityReport {
 		}
 		seen[h.ID] = true
 		r.References = append(r.References, Reference{ID: h.ID, Title: h.Title, URL: h.URL, SHA256: h.SHA256})
+		f := Finding{ID: h.ID, Title: h.Title, Evidence: []string{h.Text}, Verification: "مرجع مسترجع فقط؛ تحقق من الإصدار والتهيئة محليًا قبل تقرير التأثر."}
+		if cve := cveIDPattern.FindString(h.ID + " " + h.Title); cve != "" {
+			f.CVE = strings.ToUpper(cve)
+		}
+		if cwe := cweIDPattern.FindString(h.ID + " " + h.Title); cwe != "" {
+			f.CWE = strings.ToUpper(cwe)
+		}
+		if h.Source == "cisa-kev" && f.CVE != "" {
+			kev := true
+			f.KEV = &kev
+		}
+		if f.CVE != "" || f.CWE != "" || h.Source == "cisa-kev" {
+			r.Findings = append(r.Findings, f)
+		}
 	}
 	if len(r.Evidence) == 0 {
 		r.Evidence = []Evidence{}
@@ -119,7 +137,11 @@ func markdown(r SecurityReport) string {
 		b.WriteString("لم تُسجل ثغرة مؤكدة في هذه النتيجة. لا يعني ذلك أن الفحص شامل.\n")
 	}
 	for _, f := range r.Findings {
-		fmt.Fprintf(&b, "- **%s** (%s)\n  - CVE: %s · CWE: %s · CVSS: %s · EPSS: %s · KEV: %v\n  - الدليل: %s\n  - التوصية: %s\n  - التحقق: %s\n", f.Title, f.Severity, valueOrUnavailable(f.CVE), valueOrUnavailable(f.CWE), valueOrUnavailable(f.CVSS), valueOrUnavailable(f.EPSS), f.KEV, strings.Join(f.Evidence, "؛ "), f.Recommendation, f.Verification)
+		kev := "غير متاح"
+		if f.KEV != nil {
+			kev = fmt.Sprintf("%t", *f.KEV)
+		}
+		fmt.Fprintf(&b, "- **%s** (%s)\n  - CVE: %s · CWE: %s · CVSS: %s · EPSS: %s · KEV: %s\n  - الدليل: %s\n  - التوصية: %s\n  - التحقق: %s\n", f.Title, f.Severity, valueOrUnavailable(f.CVE), valueOrUnavailable(f.CWE), valueOrUnavailable(f.CVSS), valueOrUnavailable(f.EPSS), kev, strings.Join(f.Evidence, "؛ "), f.Recommendation, f.Verification)
 	}
 	b.WriteString("\n## المراجع\n\n")
 	for _, ref := range r.References {
