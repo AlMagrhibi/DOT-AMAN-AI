@@ -23,6 +23,7 @@
 - نموذج المحادثة: Qwen3-4B Q4_K_M من `Qwen/Qwen3-4B-GGUF`، revision `bc640142c66e1fdd12af0bd68f40445458f3869b`، Apache-2.0، SHA-256 `7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5`، الحجم 2,497,280,256 بايت. الوزن خارج Git.
 - llama.cpp: commit `c7fc5094179bf8a9c73c18593db714f8da41a402`، CPU-only Cloud.
 - أحدث Qwen بعد فحص data-boundary: كل checks نجحت، p50 `5.772s`، p95 `7.621s`، `7.914` end-to-end tok/s، peak RSS مقاس `5,258,907,648` بايت، CPU متوسط `388%` من نواة واحدة. الدليل: `docs/validation/real-model-4b-postboundary.json`.
+- أُعيد تشغيل التقييم بعد إصلاح مخطط الأدوات ونقل مصادر المعرفة. على مضيف Cloud مختلف أبطأ، نجحت العربية/الإنجليزية وStreaming cancellation، لكن طلبات JSON Schema تجاوزت مهلة 120 ثانية؛ تم حفظ الفشل صراحةً في `docs/validation/real-model-4b-toolsafe-failed.json` ولم يُستبدل به الدليل الناجح. قياس `llama-bench` لنفس المضيف هو `9.12` prompt tok/s و`0.64` generation tok/s (`docs/validation/llama-bench-4b-current-host.json`).
 - نموذج embeddings: Nomic `nomic-embed-text-v1.5.Q4_K_M.gguf`، Apache-2.0، metadata lock وSHA في `configs/embedding-model-lock.json`; التقييم الحقيقي 12/12، Recall@5 `1.0`، العربية 2/2، mean latency `32.62ms`: `docs/validation/semantic-real-postboundary.json`.
 - CISA الحقيقي: 1,754 سجلًا، CVE search، ثم طلب مشروط `not-modified` مع last-good: `docs/validation/cisa-real-sourceregistry.json`.
 - Arch container: توفر pacman/systemd/journalctl/ip/ps/df فقط؛ لم تُشغّل systemd PID1 أو صلاحيات privileged: `docs/validation/arch-container.json`.

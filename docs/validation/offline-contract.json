@@ -1,7 +1,7 @@
 {
   "scope": "local app with unusable external proxies",
-  "chat": "offline local response",
-  "connects": 23,
+  "chat": "offline local response\n\nتنبيه: لم يتم استرجاع دليل من قاعدة المعرفة لهذا الطلب؛ هذه إجابة تحليلية غير مؤكدة وتتطلب تحققًا من أداة أو مصدر موثوق.",
+  "connects": 61,
   "remote_ipv4_connects": [],
   "passed": true
 }

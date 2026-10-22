@@ -78,7 +78,7 @@ func Specs() []Spec {
 			p["properties"] = map[string]any{"path": map[string]any{"type": "string", "maxLength": 4096}, "limit": map[string]any{"type": "integer", "minimum": 1, "maximum": 65536}}
 			p["required"] = []string{"path"}
 		} else if n == "service_restart" {
-			p["properties"] = map[string]any{"service": map[string]any{"type": "string", "pattern": `^[A-Za-z0-9_.@-]{1,128}\\.service$`}}
+			p["properties"] = map[string]any{"service": map[string]any{"type": "string", "pattern": `^[A-Za-z0-9_.@-]{1,128}\.service$`}}
 			p["required"] = []string{"service"}
 		} else if n == "package_install" {
 			p["properties"] = map[string]any{"packages": map[string]any{"type": "array", "minItems": 1, "maxItems": 16, "items": map[string]any{"type": "string", "pattern": `^[A-Za-z0-9@._+:-]{1,128}$`}}}

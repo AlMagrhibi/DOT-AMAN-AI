@@ -6,6 +6,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"testing"
 	"time"
@@ -77,6 +78,41 @@ func TestAuthorizedArchActionsAreConstrained(t *testing.T) {
 		}
 	}
 }
+
+func TestRegistrySchemasMatchValidators(t *testing.T) {
+	var restart, install map[string]any
+	for _, spec := range Specs() {
+		if spec.Name != "service_restart" && spec.Name != "package_install" {
+			continue
+		}
+		b, err := json.Marshal(spec.Parameters)
+		if err != nil {
+			t.Fatal(err)
+		}
+		var schema map[string]any
+		if err = json.Unmarshal(b, &schema); err != nil {
+			t.Fatal(err)
+		}
+		if spec.Name == "service_restart" {
+			restart = schema
+		} else {
+			install = schema
+		}
+	}
+	if restart == nil || install == nil {
+		t.Fatal("mutating tools missing from registry")
+	}
+	props := restart["properties"].(map[string]any)
+	servicePattern := props["service"].(map[string]any)["pattern"].(string)
+	if !regexp.MustCompile(servicePattern).MatchString("sshd.service") || regexp.MustCompile(servicePattern).MatchString("sshdXservice") {
+		t.Fatalf("service schema pattern does not match validator: %q", servicePattern)
+	}
+	packagePattern := install["properties"].(map[string]any)["packages"].(map[string]any)["items"].(map[string]any)["pattern"].(string)
+	if !regexp.MustCompile(packagePattern).MatchString("linux-zen") || regexp.MustCompile(packagePattern).MatchString("--root=/tmp") {
+		t.Fatalf("package schema pattern does not match validator: %q", packagePattern)
+	}
+}
+
 func TestAuditFailClosed(t *testing.T) {
 	r := &runner{}
 	e := Engine{Audit: &audit{fail: true}, Runner: r}

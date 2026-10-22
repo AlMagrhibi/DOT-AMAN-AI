@@ -12,12 +12,12 @@ States describe implemented scope, not an unconditional product acceptance claim
 | 5 Knowledge | Complete for implemented scope | SQLite FTS5/BM25 plus local Nomic embeddings, bounded PDF/DOCX extraction, atomic versions, full reference SourceRegistry metadata, CISA primary/mirror conditional sync and OWASP sync; real semantic evidence `semantic-real-postboundary.json`, CISA evidence `cisa-real-postboundary.json` |
 | 6 Memory/context | Complete for bounded local scope | Conservative/custom token estimator, cross-session reviewed project memory, isolated episodic memory, automatic hierarchical compression with originals retained and restart/mutation tests |
 | 7 Agent | Complete for tested registry scope | Modes, 4-call/90s limits, RAG/context, actual observations, experiment persistence, deterministic schema planning, duplicate suppression, explicit service/package authorized actions with argv validation |
-| 8 TUI | Partial | Bubble Tea, Markdown, stream, sessions, memory, search, confirmation, copy substitute; real PTY + Unicode/resize passed at `ac6f6fa`, `174f6ff`; actual Wayland/target bidi pending |
-| 9 Reports/Arch | Partial | Arabic structured Markdown/legacy+security JSON and conditional Unicode-font PDF export; read-only systemd/journal/pacman/ip/process/filesystem registry plus constrained service/package repair; target Arch runtime/privileged authentication not validated |
+| 8 TUI | Complete for Cloud implementation | Bubble Tea, Markdown, stream, sessions, memory, search, confirmation, `/stats`, `/copy`, `/export`, PTY + Arabic/Unicode/resize/cancellation tests; KDE Wayland clipboard and target bidi rendering remain target acceptance checks |
+| 9 Reports/Arch | Complete for Cloud implementation | Arabic structured Markdown/legacy+security JSON and conditional Unicode-font PDF export; fixed diagnostics plus constrained authorized service/package repair with argv/audit tests; booted target Arch/systemd and privileged authentication remain target acceptance checks |
 | 10 Hardening | Complete for Cloud scope | gofmt/vet/build, unit/integration/race, bounded fuzz, module integrity and govulncheck v1.9.0 all passed; real 4B evaluator passed its declared smoke set |
 | 11 Handoff | Complete for Cloud delivery | Local setup, pinned build/start/download scripts, traceability/report/benchmark documents, fresh-clone evidence at `b61936a`, and continuously pushed source; final target acceptance remains explicitly separate |
 
-Validation evidence: `docs/validation/quality.json`, `retrieval.json`, `pty-cli.json`, `live-owasp.json`. See KNOWN_ISSUES.md for limitations, BENCHMARKS.md for metrics, and CODEX_IMPLEMENTATION_REPORT.md for delivery status. Nothing labeled Partial should be treated as complete.
+Validation evidence: `docs/validation/quality.json`, `retrieval.json`, `pty-cli.json`, `live-owasp.json`. See KNOWN_ISSUES.md for limitations, BENCHMARKS.md for metrics, and CODEX_IMPLEMENTATION_REPORT.md for delivery status. “Complete for Cloud implementation” describes production code plus Cloud evidence; it does not claim target-device execution.
 
 ## Current evidence
 

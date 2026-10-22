@@ -1,7 +1,7 @@
 {
   "go": "1.27.3",
   "platform": "Linux x86_64",
-  "test_passes": 32,
+  "test_passes": 54,
   "test_failures": 0,
   "test_skips": 0,
   "last_full_check_utc": "2026-10-22",
@@ -19,6 +19,7 @@
     "github.com/AlMagrhibi/DOT-AMAN-AI/internal/tui"
   ],
   "race": "passed",
-  "real_GGUF": "Qwen3-4B Q4_K_M real Cloud evaluator passed; see real-model-4b-final.json",
+  "real_GGUF": "Qwen3-4B Q4_K_M real Cloud evaluator passed in the pinned AMD EPYC run; the later current-host revalidation is retained separately as a timeout failure in real-model-4b-toolsafe-failed.json",
+  "tool_schema_registry": "service/package JSON Schema patterns match validators; internal/tools TestRegistrySchemasMatchValidators",
   "govulncheck": "v1.9.0: No vulnerabilities found; see govulncheck.txt"
 }

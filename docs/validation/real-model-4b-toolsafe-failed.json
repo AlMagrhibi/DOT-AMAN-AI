@@ -1,0 +1,124 @@
+{
+  "scope": "Codex Cloud real local GGUF smoke/benchmark; small sample, not target-device performance or comprehensive model quality",
+  "model": "/workspace/models/Qwen3-4B-Q4_K_M.gguf",
+  "date_utc": "2026-10-22T10:26:03Z",
+  "settings": {
+    "latency_percentiles": "nearest rank",
+    "max_output": 96,
+    "quality_rubric": "language presence plus lexical least-privilege access/minimum evidence; manual semantic review still required",
+    "repetitions": 1,
+    "stream": true,
+    "temperature": 0,
+    "thinking": false,
+    "warmup": "one excluded English completion; server prefix cache may remain enabled"
+  },
+  "samples": [
+    {
+      "name": "english",
+      "prompt": "In English, explain least privilege in two short sentences.",
+      "text": "Least privilege is a security principle that ensures a user or process has only the minimum level of access necessary to perform its tasks. It minimizes the potential damage from unauthorized or malicious activities by restricting permissions to essential functions only.",
+      "output_tokens": 45,
+      "input_tokens": 180,
+      "seconds": 66.142560403,
+      "ttft_seconds": 32.345453163,
+      "end_to_end_tokens_per_second": 0.6803486246347208,
+      "passed": true
+    },
+    {
+      "name": "arabic",
+      "prompt": "اشرح بالعربية مبدأ أقل امتياز في جملتين قصيرتين.",
+      "text": "مبدأ أقل امتياز يُشير إلى تقليل الامتيازات الممنوحة للأنظمة أو المستخدمين إلى الحد الأدنى اللازم للقيام بالعملية. يُستخدم لضمان الأمان والتحكم في الوصول إلى الموارد.",
+      "output_tokens": 61,
+      "input_tokens": 189,
+      "seconds": 40.295801231,
+      "ttft_seconds": 5.524191078,
+      "end_to_end_tokens_per_second": 1.5138053627550663,
+      "passed": true
+    }
+  ],
+  "checks": [
+    {
+      "name": "warmup",
+      "passed": true,
+      "detail": "<nil>"
+    },
+    {
+      "name": "schema_0",
+      "passed": false,
+      "detail": "calls=[] error=Post \"http://127.0.0.1:8081/v1/chat/completions\": net/http: timeout awaiting response headers"
+    },
+    {
+      "name": "schema_1",
+      "passed": false,
+      "detail": "calls=[] error=Post \"http://127.0.0.1:8081/v1/chat/completions\": net/http: timeout awaiting response headers"
+    },
+    {
+      "name": "schema_selection",
+      "passed": false,
+      "detail": "valid=0 correct=0 total=2; small smoke set, not a global 95% claim"
+    },
+    {
+      "name": "stream_cancellation",
+      "passed": true,
+      "detail": "chunks=1 error=context canceled"
+    },
+    {
+      "name": "rag_grounded_answer",
+      "passed": false,
+      "detail": "answer= error=Post \"http://127.0.0.1:8081/v1/chat/completions\": net/http: timeout awaiting response headers"
+    },
+    {
+      "name": "session_restart",
+      "passed": false,
+      "detail": "messages=1 error=<nil>"
+    },
+    {
+      "name": "reviewed_memory_recall",
+      "passed": false,
+      "detail": "answer= error=Post \"http://127.0.0.1:8081/v1/chat/completions\": net/http: timeout awaiting response headers"
+    },
+    {
+      "name": "app_arabic_terminology",
+      "passed": false,
+      "detail": "answer= error=Post \"http://127.0.0.1:8081/v1/chat/completions\": net/http: timeout awaiting response headers"
+    },
+    {
+      "name": "agent_real_system_info",
+      "passed": false,
+      "detail": "tools=[] error=tool planning: Post \"http://127.0.0.1:8081/v1/chat/completions\": net/http: timeout awaiting response headers"
+    }
+  ],
+  "latency_p50_seconds": 40.295801231,
+  "latency_p95_seconds": 66.142560403,
+  "aggregate_end_to_end_tokens_per_second": 0.9958815447055888,
+  "all_checks_passed": false,
+  "evaluation_exit_code": 1,
+  "model_lock": {
+    "repository": "Qwen/Qwen3-4B-GGUF",
+    "revision": "bc640142c66e1fdd12af0bd68f40445458f3869b",
+    "filename": "Qwen3-4B-Q4_K_M.gguf",
+    "sha256": "7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5",
+    "size_bytes": 2497280256,
+    "license": "Apache-2.0",
+    "license_url": "https://huggingface.co/Qwen/Qwen3-4B-GGUF/resolve/bc640142c66e1fdd12af0bd68f40445458f3869b/LICENSE",
+    "license_sha256": "5de36594c10839788a8c589443a8ef9d8b8d17c65a1b5807206ae037fc36c6bd",
+    "purpose": "Official CPU/RAM-compatible 4B Q4_K_M evaluation candidate following weak smaller-model Arabic quality"
+  },
+  "llama_version": "version: 0.7.0-dev (build 1, commit c7fc509)\nbuilt with GNU 14.2.0 for Linux x86_64",
+  "cloud_runtime": {
+    "server_context": 4096,
+    "server_threads": 4,
+    "server_parallel": 1,
+    "load_seconds": 24.41141359599999,
+    "resource_sample_interval_seconds": 0.1,
+    "gpu": "N/A; CPU-only build",
+    "hardware_scope": "Cloud, not target CachyOS hardware",
+    "sampled_peak_server_rss_bytes": 5130702848,
+    "server_cpu_seconds": 1250.57,
+    "server_average_cpu_percent_one_core": 347.01405237080905,
+    "resource_scope": "llama-server during load + evaluation; sampled RSS may miss short peaks",
+    "samples": 3095
+  },
+  "status": "failed_revalidation",
+  "failure_reason": "Current Cloud host completed Arabic/English and cancellation but JSON-schema HTTP requests exceeded the 120s provider timeout; downstream RAG/memory/tool checks were therefore not executable in this run."
+}

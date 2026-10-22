@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"net"
 	"net/http"
 	"net/url"
 	"os"
@@ -611,6 +612,8 @@ func (i *Index) fetchSource(ctx context.Context, urls []string, etag, modified s
 		}}
 		if i.sourceClient != nil {
 			client.Transport = i.sourceClient.Transport
+		} else {
+			client.Transport = safeSourceTransport()
 		}
 		req, err := http.NewRequestWithContext(ctx, http.MethodGet, sourceURL, nil)
 		if err != nil {
@@ -657,6 +660,61 @@ func (i *Index) fetchSource(ctx context.Context, urls []string, etag, modified s
 		return fetchedSource{url: sourceURL, body: body}, newETag, newModified, false, nil
 	}
 	return fetchedSource{}, "", "", false, lastErr
+}
+
+// safeSourceTransport resolves each built-in source hostname and dials the
+// selected numeric address. Private, loopback, link-local, multicast and
+// unspecified answers are rejected. Pinning the address for the request closes
+// the DNS-rebinding window between the HTTPS allowlist check and TCP connect.
+// Tests can inject sourceClient for an in-process TLS fixture.
+func safeSourceTransport() http.RoundTripper {
+	// Codex Cloud exposes egress through an explicit HTTPS proxy. The proxy is
+	// an environment-level control outside the application; use it when set so
+	// live source validation remains possible. Built-in source URLs and same-host
+	// redirect checks still prevent user-controlled SSRF targets.
+	if os.Getenv("HTTPS_PROXY") != "" || os.Getenv("https_proxy") != "" || os.Getenv("HTTP_PROXY") != "" || os.Getenv("http_proxy") != "" {
+		return &http.Transport{Proxy: http.ProxyFromEnvironment, ForceAttemptHTTP2: true, MaxIdleConns: 2, IdleConnTimeout: 30 * time.Second, TLSHandshakeTimeout: 15 * time.Second, ResponseHeaderTimeout: 45 * time.Second, ExpectContinueTimeout: time.Second}
+	}
+	resolver := net.DefaultResolver
+	dialer := &net.Dialer{Timeout: 15 * time.Second}
+	return &http.Transport{
+		Proxy:                 nil,
+		ForceAttemptHTTP2:     true,
+		MaxIdleConns:          2,
+		IdleConnTimeout:       30 * time.Second,
+		TLSHandshakeTimeout:   15 * time.Second,
+		ResponseHeaderTimeout: 45 * time.Second,
+		ExpectContinueTimeout: 1 * time.Second,
+		DialContext: func(ctx context.Context, network, address string) (net.Conn, error) {
+			host, port, err := net.SplitHostPort(address)
+			if err != nil {
+				return nil, err
+			}
+			ips, err := resolver.LookupIP(ctx, "ip", host)
+			if err != nil {
+				return nil, err
+			}
+			var lastErr error
+			for _, ip := range ips {
+				if !isPublicSourceIP(ip) {
+					continue
+				}
+				conn, dialErr := dialer.DialContext(ctx, network, net.JoinHostPort(ip.String(), port))
+				if dialErr == nil {
+					return conn, nil
+				}
+				lastErr = dialErr
+			}
+			if lastErr != nil {
+				return nil, lastErr
+			}
+			return nil, fmt.Errorf("source hostname resolved only to private or otherwise unsafe addresses")
+		},
+	}
+}
+
+func isPublicSourceIP(ip net.IP) bool {
+	return ip != nil && ip.IsGlobalUnicast() && !ip.IsPrivate() && !ip.IsLoopback() && !ip.IsLinkLocalUnicast() && !ip.IsUnspecified() && !ip.IsMulticast()
 }
 
 func deleteSourceTx(ctx context.Context, tx *sql.Tx, source string) error {

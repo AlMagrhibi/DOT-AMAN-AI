@@ -54,3 +54,5 @@ Govulncheck scanned the following 34 modules and the go1.27.3 standard library:
   golang.org/x/text@v0.42.0
 
 No vulnerabilities found.
+
+Latest rerun after tool-schema and source-transport hardening (2026-10-22): No vulnerabilities found.

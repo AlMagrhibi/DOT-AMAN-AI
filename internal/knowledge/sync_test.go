@@ -3,6 +3,7 @@ package knowledge
 import (
 	"context"
 	"fmt"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -63,6 +64,19 @@ func TestSyncErrorRetainsLastGoodDocument(t *testing.T) {
 	history, err := i.SyncHistory(context.Background(), "cisa-kev", 1)
 	if err != nil || len(history) != 1 || history[0].Status != "error" {
 		t.Fatalf("history=%v err=%v", history, err)
+	}
+}
+
+func TestSourceIPPolicyRejectsPrivateAddresses(t *testing.T) {
+	for _, raw := range []string{"127.0.0.1", "10.0.0.8", "192.168.1.10", "169.254.1.2", "::1", "fc00::1"} {
+		if isPublicSourceIP(net.ParseIP(raw)) {
+			t.Fatalf("private address accepted: %s", raw)
+		}
+	}
+	for _, raw := range []string{"1.1.1.1", "2001:4860:4860::8888"} {
+		if !isPublicSourceIP(net.ParseIP(raw)) {
+			t.Fatalf("public address rejected: %s", raw)
+		}
 	}
 }
 
