@@ -10,7 +10,7 @@
 | 5 Knowledge | Partial | FTS5 BM25, Arabic normalization, provenance, versioned document replacement/import/search tested; live feed and evaluation pending |
 | 6 Memory/context | Partial | Reviewed memory correction/deletion/isolation and source-linked summary storage tested; automatic hierarchical compression pending |
 | 7 Agent | Partial | Analysis/Confirm/Auto orchestration, 4-step/90-second limits, RAG/context integration, restart and real uname tests passed; quality evaluation pending |
-| 8 TUI | Deferred | Not implemented yet |
+| 8 TUI | Partial | Bubble Tea streaming, sessions/mode/memory/search commands, confirmation, copy mock, Unicode/resize and real PTY passed; full Markdown and Wayland pending |
 | 9 Reports/Arch | Partial | Markdown/JSON export and read-only Arch diagnostics implemented; Arch target not available in Cloud |
 | 10 Hardening | Deferred | Not implemented yet |
 | 11 Handoff | Deferred | Not implemented yet |

@@ -74,24 +74,30 @@ func Normalize(s string) string {
 	}, s)
 }
 func (i *Index) Put(ctx context.Context, d Document) error {
+	tx, err := i.DB.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+	if err = i.put(ctx, tx, d); err != nil {
+		return err
+	}
+	return tx.Commit()
+}
+func (i *Index) put(ctx context.Context, tx *sql.Tx, d Document) error {
 	if d.ID == "" || d.Source == "" || d.Title == "" || d.Text == "" || len(d.Text) > 2<<20 || !utf8.ValidString(d.Text) {
 		return fmt.Errorf("invalid document")
 	}
 	sum := sha256.Sum256([]byte(d.Text))
 	sha := hex.EncodeToString(sum[:])
 	now := time.Now().UTC().Format(time.RFC3339)
-	tx, err := i.DB.BeginTx(ctx, nil)
-	if err != nil {
-		return err
-	}
-	defer tx.Rollback()
 	var old string
-	err = tx.QueryRowContext(ctx, `SELECT sha FROM documents WHERE id=?`, d.ID).Scan(&old)
+	err := tx.QueryRowContext(ctx, `SELECT sha FROM documents WHERE id=?`, d.ID).Scan(&old)
 	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
 	if old == sha {
-		return tx.Commit()
+		return nil
 	}
 	if _, err = tx.ExecContext(ctx, `DELETE FROM chunks_fts WHERE chunk IN (SELECT id FROM chunks WHERE document=?)`, d.ID); err != nil {
 		return err
@@ -127,7 +133,7 @@ func (i *Index) Put(ctx context.Context, d Document) error {
 			break
 		}
 	}
-	return tx.Commit()
+	return nil
 }
 func (i *Index) Search(ctx context.Context, query string, limit int) ([]Hit, error) {
 	if limit < 1 || limit > 20 {
@@ -280,14 +286,25 @@ func (i *Index) Sync(ctx context.Context, id string) error {
 		}
 		docs = append(docs, Document{ID: "owasp-sql-injection", Source: id, URL: url, Title: "OWASP SQL Injection Prevention", Text: string(b)})
 	}
-	// Each document replacement is atomic. Whole-feed atomic sync is tracked as a remaining limitation.
+	// Commit the entire validated feed and its sync metadata atomically.
+	tx, err := i.DB.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
 	for _, d := range docs {
-		if err = i.Put(ctx, d); err != nil {
-			return i.syncError(ctx, id, err)
+		if err = i.put(ctx, tx, d); err != nil {
+			return err
 		}
 	}
-	_, err = i.DB.ExecContext(ctx, `UPDATE sources SET last_sync=?,status='synced',error='' WHERE id=?`, time.Now().UTC().Format(time.RFC3339), id)
-	return err
+	_, err = tx.ExecContext(ctx, `UPDATE sources SET last_sync=?,status='synced',error='' WHERE id=?`, time.Now().UTC().Format(time.RFC3339), id)
+	if err != nil {
+		return err
+	}
+	if _, err = tx.ExecContext(ctx, `INSERT INTO sync_history(source,status,detail,created) VALUES(?,?,?,?)`, id, "synced", fmt.Sprint(len(docs)), time.Now().UTC().Format(time.RFC3339)); err != nil {
+		return err
+	}
+	return tx.Commit()
 }
 func (i *Index) syncError(ctx context.Context, id string, cause error) error {
 	_, err := i.DB.ExecContext(ctx, `UPDATE sources SET status='error',error=? WHERE id=?`, cause.Error(), id)

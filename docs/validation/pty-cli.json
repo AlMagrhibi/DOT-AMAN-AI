@@ -1,0 +1,9 @@
+{
+  "fixture": "local HTTP, not real model",
+  "cli_chat": "passed",
+  "session_restart_export": "passed",
+  "offline_import_arabic_search": "passed",
+  "pty_arabic_stream_resize_default": "passed",
+  "pty_stats_quit": "passed",
+  "real_wayland_clipboard": "unrun"
+}

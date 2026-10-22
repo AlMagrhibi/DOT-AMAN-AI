@@ -204,6 +204,9 @@ func ParseSuggestions(text string) ([]tools.Call, error) {
 	return v.Calls, nil
 }
 func (h *HTTP) StreamCompletion(ctx context.Context, m []Message, max int, onText func(string) error) (Response, error) {
+	if max < 1 || max > 32768 {
+		return Response{}, fmt.Errorf("invalid output budget")
+	}
 	p := payload(m, max)
 	p["stream"] = true
 	p["stream_options"] = map[string]any{"include_usage": true}

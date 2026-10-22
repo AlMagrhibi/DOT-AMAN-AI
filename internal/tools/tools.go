@@ -162,7 +162,7 @@ func (e *Engine) files(ctx context.Context, name string, a Args) (string, error)
 		if !info.IsDir() {
 			return "", fmt.Errorf("not a directory")
 		}
-		f, err := root.Open(a.Path)
+		f, err := root.OpenFile(a.Path, os.O_RDONLY|syscall.O_NONBLOCK, 0)
 		if err != nil {
 			return "", err
 		}
@@ -185,7 +185,7 @@ func (e *Engine) files(ctx context.Context, name string, a Args) (string, error)
 	if !info.Mode().IsRegular() {
 		return "", fmt.Errorf("not a regular file")
 	}
-	f, err := root.Open(a.Path)
+	f, err := root.OpenFile(a.Path, os.O_RDONLY|syscall.O_NONBLOCK, 0)
 	if err != nil {
 		return "", err
 	}
