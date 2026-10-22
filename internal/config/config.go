@@ -20,6 +20,9 @@ type Config struct {
 	Mode              string `toml:"mode"`
 	Context           int    `toml:"context"`
 	MaxOutput         int    `toml:"max_output"`
+	MaxSteps          int    `toml:"max_steps"`
+	MaxRuntimeSeconds int    `toml:"max_runtime_seconds"`
+	MaxRetries        int    `toml:"max_retries"`
 }
 
 func Default() (Config, error) {
@@ -35,7 +38,7 @@ func Default() (Config, error) {
 	if err != nil {
 		return Config{}, err
 	}
-	return Config{Endpoint: "http://127.0.0.1:8081", DataDir: filepath.Join(base, "dotamanai-codex"), Root: root, Mode: "analysis", Context: 4096, MaxOutput: 512}, nil
+	return Config{Endpoint: "http://127.0.0.1:8081", DataDir: filepath.Join(base, "dotamanai-codex"), Root: root, Mode: "analysis", Context: 4096, MaxOutput: 512, MaxSteps: 4, MaxRuntimeSeconds: 90, MaxRetries: 1}, nil
 }
 func ValidateEndpoint(s string) error {
 	u, err := url.Parse(s)
@@ -65,6 +68,9 @@ func (c Config) Validate() error {
 	}
 	if c.Context < 512 || c.Context > 131072 || c.MaxOutput < 1 || c.MaxOutput >= c.Context/2 {
 		return fmt.Errorf("invalid context budget")
+	}
+	if c.MaxSteps < 1 || c.MaxSteps > 8 || c.MaxRuntimeSeconds < 1 || c.MaxRuntimeSeconds > 600 || c.MaxRetries < 0 || c.MaxRetries > 3 {
+		return fmt.Errorf("invalid agent limits")
 	}
 	return nil
 }

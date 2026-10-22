@@ -27,3 +27,17 @@ func TestUnknownConfig(t *testing.T) {
 		t.Fatal("accepted unknown setting")
 	}
 }
+
+func TestAgentLimits(t *testing.T) {
+	c, err := Default()
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, mutate := range []func(*Config){func(x *Config) { x.MaxSteps = 0 }, func(x *Config) { x.MaxRuntimeSeconds = 601 }, func(x *Config) { x.MaxRetries = 4 }} {
+		x := c
+		mutate(&x)
+		if err = x.Validate(); err == nil {
+			t.Fatal("accepted invalid agent limit")
+		}
+	}
+}

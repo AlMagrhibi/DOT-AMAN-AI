@@ -7,3 +7,6 @@ root = "/tmp"
 mode = "analysis"
 context = 4096
 max_output = 512
+max_steps = 4
+max_runtime_seconds = 90
+max_retries = 1

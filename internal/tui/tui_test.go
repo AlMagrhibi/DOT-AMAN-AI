@@ -8,6 +8,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"strings"
 	"testing"
+	"time"
 )
 
 type clip struct{ text string }
@@ -41,5 +42,33 @@ func TestResizeCopyAndUnicode(t *testing.T) {
 	m.command("/mode auto")
 	if a.Config.Mode != "auto" {
 		t.Fatal("mode unchanged")
+	}
+}
+
+func TestCancelRunningRequest(t *testing.T) {
+	c, err := config.Default()
+	if err != nil {
+		t.Fatal(err)
+	}
+	c.DataDir = t.TempDir()
+	c.Root = t.TempDir()
+	a, err := app.Open(c, model.Mock{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer a.Close()
+	m := New(a, "", nil)
+	ctx, cancel := context.WithCancel(context.Background())
+	m.busy = true
+	m.cancel = cancel
+	v, _ := m.Update(tea.KeyMsg{Type: tea.KeyCtrlC})
+	m = v.(Model)
+	select {
+	case <-ctx.Done():
+	case <-time.After(time.Second):
+		t.Fatal("cancel did not reach running request")
+	}
+	if !strings.Contains(m.status, "الإلغاء") {
+		t.Fatalf("unexpected status: %s", m.status)
 	}
 }

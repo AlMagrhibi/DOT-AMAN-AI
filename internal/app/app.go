@@ -73,7 +73,7 @@ func (a *App) Run(ctx context.Context, session, prompt string, approve func(tool
 	if strings.TrimSpace(prompt) == "" || len(prompt) > 65536 {
 		return out, fmt.Errorf("empty or oversized prompt")
 	}
-	ctx, cancel := context.WithTimeout(ctx, 90*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, time.Duration(a.Config.MaxRuntimeSeconds)*time.Second)
 	defer cancel()
 	if session == "" {
 		title := []rune(prompt)
@@ -146,16 +146,22 @@ func (a *App) Run(ctx context.Context, session, prompt string, approve func(tool
 		return out, err
 	}
 	if a.Config.Mode != "analysis" {
-		remaining := 4
+		remaining := a.Config.MaxSteps
 		attempted := map[string]bool{}
-		for step := 0; step < 4 && remaining > 0; step++ {
+		for step := 0; step < a.Config.MaxSteps && remaining > 0; step++ {
 			planning, err := contextmanager.Build(System+"\n"+model.SuggestionInstructions(), prompt, messages[1:], "", a.Config.Context, 512)
 			if err != nil {
 				return out, err
 			}
-			calls, err := a.Model.Suggest(ctx, planning)
-			if err != nil {
-				return out, fmt.Errorf("tool planning: %w", err)
+			var calls []tools.Call
+			for attempt := 0; attempt <= a.Config.MaxRetries; attempt++ {
+				calls, err = a.Model.Suggest(ctx, planning)
+				if err == nil {
+					break
+				}
+				if attempt == a.Config.MaxRetries {
+					return out, fmt.Errorf("tool planning: %w", err)
+				}
 			}
 			if len(calls) == 0 {
 				break

@@ -1,0 +1,16 @@
+{
+  "scope": "Arch Linux base container command availability; not CachyOS, not a booted systemd session, not target hardware",
+  "image": "archlinux:base",
+  "image_digest": "sha256:52dfbd5afb23a220d5ee92dafcb4c788d96c026ed04179890c23adef4c897fa0",
+  "image_version_id": "20261018.0.612668",
+  "pacman": "pacman 7.1.0.r9.g54d9411-3",
+  "systemd": "systemd 262 (262-1-arch)",
+  "journalctl": "systemd 262 (262-1-arch)",
+  "commands_present": ["/usr/sbin/ip", "/usr/sbin/ps", "/usr/bin/df"],
+  "result": "passed",
+  "limitations": [
+    "The container did not boot a systemd PID 1.",
+    "No privileged package/service repair was executed.",
+    "This does not validate CachyOS, KDE Wayland, or the target i5-1145G7."
+  ]
+}
