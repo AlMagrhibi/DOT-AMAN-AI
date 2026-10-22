@@ -23,7 +23,7 @@ def main():
             base=[str(ROOT/'bin/dotamanai-codex'),'-config',str(cfg)]
             subprocess.run(base+['doctor'],check=True,capture_output=True)
             o=json.loads(subprocess.run(base+['-json','chat','اختبار Linux'],check=True,capture_output=True).stdout)
-            assert o['text']=='أمان Linux fixture' and o['usage']['completion_tokens']==4
+            assert o['text'].startswith('أمان Linux fixture') and 'لم يتم استرجاع دليل' in o['text'] and o['usage']['completion_tokens']==4
             messages=json.loads(subprocess.run(base+['export-session',o['session']],check=True,capture_output=True).stdout)
             assert len(messages)==2 and messages[0]['content']=='اختبار Linux'
             doc=pathlib.Path(td)/'fixture.md';doc.write_text('أَمَان Linux: least privilege and prepared statements.')
