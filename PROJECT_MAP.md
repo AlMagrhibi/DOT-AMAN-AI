@@ -15,6 +15,6 @@ States describe implemented scope, not an unconditional product acceptance claim
 | 8 TUI | Partial | Bubble Tea, Markdown, stream, sessions, memory, search, confirmation, copy substitute; real PTY + Unicode/resize passed at `ac6f6fa`, `174f6ff`; actual Wayland/target bidi pending |
 | 9 Reports/Arch | Partial | Private Arabic Markdown/JSON evidence exports, read-only systemd/journal/pacman/ip registry; target Arch runtime/privileged repair not validated or implemented |
 | 10 Hardening | Partial | gofmt/vet/build, 32 passing test/subtest/fuzz-seed outcomes with race; no failures/skips; bounded fuzz runs and module integrity passed; vulnerability DB and full real-model quality checks blocked |
-| 11 Handoff | Partial | Local setup, pinned build/start/download scripts, saved install/start draft, continuously pushed source; fresh-clone/archive verification recorded in follow-up; full acceptance requires blockers resolved |
+| 11 Handoff | Partial | Local setup, pinned build/start/download scripts, saved install/start draft, continuously pushed source; fresh-clone build/tests/PTY and identical binaries verified at `5afeaf0`; source archive provided in chat; full acceptance requires blockers resolved |
 
 Validation evidence: `docs/validation/quality.json`, `retrieval.json`, `pty-cli.json`, `live-owasp.json`. See KNOWN_ISSUES.md for limitations, BENCHMARKS.md for metrics, and CODEX_IMPLEMENTATION_REPORT.md for delivery status. Nothing labeled Partial should be treated as complete.

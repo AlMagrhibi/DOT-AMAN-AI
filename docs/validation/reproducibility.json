@@ -1,0 +1,21 @@
+{
+  "verified_revision": "5afeaf0a62daa173d6695b4c453c276622ec8787",
+  "source": "fresh HTTPS clone of origin/main",
+  "checks": [
+    "gofmt",
+    "go vet",
+    "go test -count=1",
+    "go build",
+    "PTY/CLI local HTTP fixture",
+    "go mod verify"
+  ],
+  "tracked_or_untracked_changes_after_checks": [],
+  "reproducibility": {
+    "scope": "same Cloud toolchain, architecture and dependency cache; two distinct checkout paths",
+    "flags": "-tags sqlite_fts5 -trimpath -buildvcs=false",
+    "binary_sha256": "b6fa00ffade9f5acf8beee3662307b646da6baf54579e006d4fba7d51ea1f91d",
+    "identical": true
+  },
+  "real_model": "not validated: download blocked",
+  "remote_CI": "not observed"
+}

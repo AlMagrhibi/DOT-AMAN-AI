@@ -20,3 +20,7 @@ This small synthetic set tests lexical retrieval and normalization. It cannot es
 - `go mod verify`: all downloaded modules verified. `govulncheck` database fetch blocked; vulnerability results unavailable.
 
 Cloud functional checks use real SQLite/WAL/FTS5 and real local processes. Offline verification covers loopback-only transport and local operations; a target-device physical network-isolation test remains required.
+
+## Fresh-clone and reproducible build
+
+Verified pushed revision `5afeaf0a62daa173d6695b4c453c276622ec8787` from a fresh HTTPS clone in a second directory: formatting, vet, tests/build, CLI/PTY fixture and module verification passed; no checkout changes. Two builds with `-tags sqlite_fts5 -trimpath -buildvcs=false` produced identical SHA-256 `b6fa00ffade9f5acf8beee3662307b646da6baf54579e006d4fba7d51ea1f91d` using the same Cloud toolchain, architecture and module cache. This does not establish bit-identical output across different C toolchains or architectures. Details: [reproducibility evidence](docs/validation/reproducibility.json).
