@@ -1,0 +1,11 @@
+{
+  "repository": "Qwen/Qwen3-1.7B-GGUF",
+  "revision": "90862c4b9d2787eaed51d12237eafdfe7c5f6077",
+  "filename": "Qwen3-1.7B-Q8_0.gguf",
+  "sha256": "061b54daade076b5d3362dac252678d17da8c68f07560be70818cace6590cb1a",
+  "size_bytes": 1834426016,
+  "license": "Apache-2.0",
+  "license_url": "https://huggingface.co/Qwen/Qwen3-1.7B-GGUF/resolve/90862c4b9d2787eaed51d12237eafdfe7c5f6077/LICENSE",
+  "license_sha256": "5de36594c10839788a8c589443a8ef9d8b8d17c65a1b5807206ae037fc36c6bd",
+  "purpose": "Official 1.7B evaluation candidate following weak 0.6B semantic/tool results; Q8_0 is the available official GGUF"
+}

@@ -12,10 +12,10 @@ def counters(pid):
     return cpu,rss
 
 def main():
-    parser=argparse.ArgumentParser();parser.add_argument('--runs',type=int,default=3);parser.add_argument('--output',type=pathlib.Path,required=True);args=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument('--model-lock',type=pathlib.Path,default=ROOT/'configs/model-lock.json');parser.add_argument('--runs',type=int,default=3);parser.add_argument('--output',type=pathlib.Path,required=True);args=parser.parse_args()
     if not 1<=args.runs<=20:parser.error('runs must be 1..20')
     model=pathlib.Path(os.environ['MODEL_PATH']).resolve();server=pathlib.Path(os.environ['LLAMA_SERVER']).resolve()
-    lock=json.loads((ROOT/'configs/model-lock.json').read_text());h=hashlib.sha256()
+    lock=json.loads(args.model_lock.read_text());h=hashlib.sha256()
     with model.open('rb') as f:
         for b in iter(lambda:f.read(1024*1024),b''):h.update(b)
     if h.hexdigest()!=lock['sha256'] or model.stat().st_size!=lock['size_bytes']:raise RuntimeError('GGUF does not match official pinned metadata')

@@ -1,0 +1,8 @@
+{
+  "architecture": "x86_64",
+  "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+  "logical_cpus_visible": 5,
+  "affinity_cpus": 5,
+  "kernel": "6.18.55",
+  "scope": "Codex Cloud, not target-device hardware"
+}

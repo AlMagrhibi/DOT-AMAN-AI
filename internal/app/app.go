@@ -136,8 +136,7 @@ func (a *App) Run(ctx context.Context, session, prompt string, approve func(tool
 	if a.Config.Mode != "analysis" {
 		remaining := 4
 		for step := 0; step < 4 && remaining > 0; step++ {
-			schema, _ := json.Marshal(tools.Specs())
-			planning, err := contextmanager.Build(System, "Suggest only necessary read-only tools; empty calls when sufficient evidence. Root-relative paths. Registry: "+string(schema), messages[1:], "", a.Config.Context, 512)
+			planning, err := contextmanager.Build(System+"\n"+model.SuggestionInstructions(), prompt, messages[1:], "", a.Config.Context, 512)
 			if err != nil {
 				return out, err
 			}

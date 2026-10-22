@@ -2,7 +2,9 @@ package model
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"github.com/AlMagrhibi/DOT-AMAN-AI/internal/tools"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -104,5 +106,50 @@ func TestInferenceIgnoresExternalProxy(t *testing.T) {
 		if _, err = New(u); err == nil {
 			t.Fatal("external endpoint accepted", u)
 		}
+	}
+}
+
+func TestSuggestionDiscriminatorPrecedesArguments(t *testing.T) {
+	original := []Message{{Role: "system", Content: "original"}, {Role: "user", Content: "inspect kernel"}}
+	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var p struct {
+			Messages       []Message `json:"messages"`
+			Temperature    float64   `json:"temperature"`
+			ResponseFormat struct {
+				Schema struct {
+					Schema struct {
+						Properties struct {
+							Calls struct {
+								Items struct {
+									Variants []struct {
+										Properties json.RawMessage `json:"properties"`
+									} `json:"oneOf"`
+								} `json:"items"`
+							} `json:"calls"`
+						} `json:"properties"`
+					} `json:"schema"`
+				} `json:"json_schema"`
+			} `json:"response_format"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&p); err != nil {
+			t.Error(err)
+		}
+		if p.Temperature != 0 || len(p.ResponseFormat.Schema.Schema.Properties.Calls.Items.Variants) != len(tools.Specs()) {
+			t.Error("missing deterministic planning/schema")
+		}
+		for _, v := range p.ResponseFormat.Schema.Schema.Properties.Calls.Items.Variants {
+			if !strings.HasPrefix(string(v.Properties), `{"name":`) {
+				t.Errorf("llama.cpp would constrain arguments before discriminator: %s", v.Properties)
+			}
+		}
+		fmt.Fprint(w, `{"choices":[{"message":{"content":"{\"calls\":[]}"}}]}`)
+	}))
+	defer s.Close()
+	h, _ := New(s.URL)
+	if _, err := h.Suggest(context.Background(), original); err != nil {
+		t.Fatal(err)
+	}
+	if original[0].Content != "original" {
+		t.Fatal("caller history mutated")
 	}
 }

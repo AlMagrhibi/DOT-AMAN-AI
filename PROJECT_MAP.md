@@ -37,3 +37,11 @@ Dependency follow-up: all reported module/package findings remediated via x/net 
 ## GGUF access resolved
 
 Official Qwen3-0.6B Q8_0 downloaded and verified against pinned publisher size/SHA-256 and license digest. Weights remain outside the checkout. Evidence: docs/validation/model-verification.json. Real llama-server evaluation is now being executed; results are recorded separately and no pass is assumed.
+
+### First real run (0.6B)
+
+GGUF health/model info, Arabic/English SSE transport, cancellation, RAG answer, persisted session and reviewed memory executed against actual llama-server. Overall result FAILED: tool selection 3/6, agent suggestion invalid; manual review found semantically wrong Arabic answers despite script-level language checks passing. The initial raw report is retained in docs/validation/real-model-initial.json. A stronger concept rubric and explicit tool instructions are being tested; no success was inferred from schema validity alone. Official 1.7B Q8_0 was independently digest-verified as the next candidate.
+
+### Real integration diagnosis
+
+The first 1.7B run also failed: Arabic concept checks 0/3, structured choices 0/6, while RAG/session/memory and cancellation passed. A direct llama.cpp request demonstrated the tool-name discriminator must appear before tool-specific arguments in the generated grammar. Go maps serialized arguments first. Ordered schema properties, explicit registry instructions, deterministic planning and mandatory-context accounting were added; unit/build gates passed and corrected real evaluation is in progress. Raw failed runs remain committed for review. The newer semantic rubric checks more than the initial language-only smoke.

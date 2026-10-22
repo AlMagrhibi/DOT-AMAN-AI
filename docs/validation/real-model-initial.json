@@ -1,0 +1,180 @@
+{
+  "scope": "Codex Cloud real local GGUF smoke/benchmark; small sample, not target-device performance or comprehensive model quality",
+  "model": "/workspace/models/Qwen3-0.6B-Q8_0.gguf",
+  "date_utc": "2026-10-22T08:44:52Z",
+  "settings": {
+    "latency_percentiles": "nearest rank",
+    "max_output": 96,
+    "repetitions": 3,
+    "stream": true,
+    "temperature": 0.2,
+    "thinking": false,
+    "warmup": "one excluded English completion; server prefix cache may remain enabled"
+  },
+  "samples": [
+    {
+      "name": "english",
+      "prompt": "In English, explain least privilege in two short sentences.",
+      "text": "Least privilege is a security principle that ensures users only have access to the resources they need, based on their roles and responsibilities. It minimizes the risk of unauthorized access and helps maintain security.",
+      "output_tokens": 39,
+      "input_tokens": 43,
+      "seconds": 1.268517745,
+      "ttft_seconds": 0.260776745,
+      "end_to_end_tokens_per_second": 30.744544294884893,
+      "passed": true
+    },
+    {
+      "name": "arabic",
+      "prompt": "اشرح بالعربية مبدأ أقل امتياز في جملتين قصيرتين.",
+      "text": "يقول المبدأ أقل امتياز في جملتين قصيرة: \"الإنسان لا يُعاقب إلا إذا أدى إلى أفعال مُحرِّرة.\"",
+      "output_tokens": 43,
+      "input_tokens": 52,
+      "seconds": 1.252163986,
+      "ttft_seconds": 0.215817168,
+      "end_to_end_tokens_per_second": 34.3405500244119,
+      "passed": true
+    },
+    {
+      "name": "english",
+      "prompt": "In English, explain least privilege in two short sentences.",
+      "text": "In least privilege, users are granted only the minimum level of access required to perform their tasks. (Case 1)  \n\nIn least privilege, users are granted only the minimum level of access required to perform their tasks. (Case 2)",
+      "output_tokens": 50,
+      "input_tokens": 43,
+      "seconds": 1.193526022,
+      "ttft_seconds": 0.104126515,
+      "end_to_end_tokens_per_second": 41.89267689045828,
+      "passed": true
+    },
+    {
+      "name": "arabic",
+      "prompt": "اشرح بالعربية مبدأ أقل امتياز في جملتين قصيرتين.",
+      "text": "مبدأ أقل امتياز هو أن لا يُعتبر أي معلومات غير مُوثقة أو مُناسبة.",
+      "output_tokens": 29,
+      "input_tokens": 52,
+      "seconds": 0.705839173,
+      "ttft_seconds": 0.073925549,
+      "end_to_end_tokens_per_second": 41.085846619623645,
+      "passed": true
+    },
+    {
+      "name": "english",
+      "prompt": "In English, explain least privilege in two short sentences.",
+      "text": "In two short sentences:  \n1. Least privilege is a security principle that limits users' access to resources based on their roles and responsibilities.  \n2. It ensures that users only have access to what is necessary for their job or task.",
+      "output_tokens": 49,
+      "input_tokens": 43,
+      "seconds": 1.199066209,
+      "ttft_seconds": 0.096626937,
+      "end_to_end_tokens_per_second": 40.865132911105164,
+      "passed": true
+    },
+    {
+      "name": "arabic",
+      "prompt": "اشرح بالعربية مبدأ أقل امتياز في جملتين قصيرتين.",
+      "text": "مبدأ أقل امتياز في جملتين قصيرتين هو أن لا تُعدّد المبالغ أو القيم المُعدّدة.",
+      "output_tokens": 34,
+      "input_tokens": 52,
+      "seconds": 0.916961168,
+      "ttft_seconds": 0.108611446,
+      "end_to_end_tokens_per_second": 37.07899656662451,
+      "passed": true
+    }
+  ],
+  "checks": [
+    {
+      "name": "warmup",
+      "passed": true,
+      "detail": "<nil>"
+    },
+    {
+      "name": "schema_0",
+      "passed": true,
+      "detail": "calls=[{system_info {}}] error=<nil>"
+    },
+    {
+      "name": "schema_1",
+      "passed": true,
+      "detail": "calls=[{list_dir {\n        \"path\": \"system_info\",\n        \"limit\": 1\n      }}] error=<nil>"
+    },
+    {
+      "name": "schema_2",
+      "passed": true,
+      "detail": "calls=[{system_info {}}] error=<nil>"
+    },
+    {
+      "name": "schema_3",
+      "passed": true,
+      "detail": "calls=[{list_dir {\n        \"path\": \"system_info\",\n        \"limit\": 1\n      }}] error=<nil>"
+    },
+    {
+      "name": "schema_4",
+      "passed": true,
+      "detail": "calls=[{system_info {}}] error=<nil>"
+    },
+    {
+      "name": "schema_5",
+      "passed": true,
+      "detail": "calls=[{list_dir {\n        \"path\": \"system_info\",\n        \"limit\": 1\n      }}] error=<nil>"
+    },
+    {
+      "name": "schema_selection",
+      "passed": false,
+      "detail": "valid=6 correct=3 total=6; small smoke set, not a global 95% claim"
+    },
+    {
+      "name": "stream_cancellation",
+      "passed": true,
+      "detail": "chunks=1 error=context canceled"
+    },
+    {
+      "name": "rag_grounded_answer",
+      "passed": true,
+      "detail": "answer=PORT: 43871\n\nالمراجع المسترجعة (لا تعني التحقق من كل ادعاء):\n[keystone] fixture:keystone error=<nil>"
+    },
+    {
+      "name": "session_restart",
+      "passed": true,
+      "detail": "messages=2 error=<nil>"
+    },
+    {
+      "name": "reviewed_memory_recall",
+      "passed": true,
+      "detail": "answer=الاسم المُعدن: Cedar-Falcon-728\n\nالمراجع المسترجعة (لا تعني التحقق من كل ادعاء):\n[keystone] fixture:keystone error=<nil>"
+    },
+    {
+      "name": "agent_real_system_info",
+      "passed": false,
+      "detail": "tools=[] error=tool planning: path must be relative and confined"
+    }
+  ],
+  "latency_p50_seconds": 1.193526022,
+  "latency_p95_seconds": 1.268517745,
+  "aggregate_end_to_end_tokens_per_second": 37.33127695442602,
+  "all_checks_passed": false,
+  "evaluation_exit_code": 1,
+  "model_lock": {
+    "repository": "Qwen/Qwen3-0.6B-GGUF",
+    "revision": "23749fefcc72300e3a2ad315e1317431b06b590a",
+    "filename": "Qwen3-0.6B-Q8_0.gguf",
+    "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031",
+    "size_bytes": 639446688,
+    "license": "Apache-2.0",
+    "license_url": "https://huggingface.co/Qwen/Qwen3-0.6B-GGUF/resolve/23749fefcc72300e3a2ad315e1317431b06b590a/LICENSE",
+    "license_sha256": "5de36594c10839788a8c589443a8ef9d8b8d17c65a1b5807206ae037fc36c6bd",
+    "purpose": "Official small multilingual Cloud evaluation model; not claimed equivalent to target reference model quality"
+  },
+  "llama_version": "version: 0.7.0-dev (build 1, commit c7fc509)\nbuilt with GNU 14.2.0 for Linux x86_64",
+  "cloud_runtime": {
+    "server_context": 4096,
+    "server_threads": 4,
+    "server_parallel": 1,
+    "load_seconds": 1.4423605070005578,
+    "resource_sample_interval_seconds": 0.1,
+    "gpu": "N/A; CPU-only build",
+    "hardware_scope": "Cloud, not target CachyOS hardware",
+    "sampled_peak_server_rss_bytes": 1270497280,
+    "server_cpu_seconds": 86.24,
+    "server_average_cpu_percent_one_core": 370.91294827546557,
+    "resource_scope": "llama-server during load + evaluation; sampled RSS may miss short peaks",
+    "samples": 231
+  }
+}

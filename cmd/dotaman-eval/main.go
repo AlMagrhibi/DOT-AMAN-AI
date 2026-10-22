@@ -81,7 +81,7 @@ func run(endpoint string, runs int) error {
 	if strings.Contains(strings.ToLower(info), "fixture") || strings.Contains(strings.ToLower(info), "mock") {
 		return fmt.Errorf("fixture model refused")
 	}
-	r := report{Scope: "Codex Cloud real local GGUF smoke/benchmark; small sample, not target-device performance or comprehensive model quality", Model: info, Date: time.Now().UTC().Format(time.RFC3339), Settings: map[string]any{"repetitions": runs, "max_output": 96, "temperature": 0.2, "thinking": false, "stream": true, "latency_percentiles": "nearest rank", "warmup": "one excluded English completion; server prefix cache may remain enabled"}}
+	r := report{Scope: "Codex Cloud real local GGUF smoke/benchmark; small sample, not target-device performance or comprehensive model quality", Model: info, Date: time.Now().UTC().Format(time.RFC3339), Settings: map[string]any{"repetitions": runs, "max_output": 96, "temperature": 0.2, "thinking": false, "stream": true, "latency_percentiles": "nearest rank", "warmup": "one excluded English completion; server prefix cache may remain enabled", "quality_rubric": "language presence plus lexical least-privilege access/minimum evidence; manual semantic review still required"}}
 	add := func(name string, ok bool, detail string) { r.Checks = append(r.Checks, check{name, ok, detail}) }
 	_, err = p.Complete(ctx, "Reply with READY.", 16)
 	add("warmup", err == nil, fmt.Sprint(err))
@@ -91,7 +91,7 @@ func run(endpoint string, runs int) error {
 			arabic       bool
 		}{{"english", "In English, explain least privilege in two short sentences.", false}, {"arabic", "اشرح بالعربية مبدأ أقل امتياز في جملتين قصيرتين.", true}} {
 			text := ""
-			res, e := p.StreamCompletion(ctx, []model.Message{{Role: "system", Content: "Answer briefly and accurately. Follow the requested language."}, {Role: "user", Content: fmt.Sprintf("%s [case %d]", q.prompt, n)}}, 96, func(s string) error { text += s; return nil })
+			res, e := p.StreamCompletion(ctx, []model.Message{{Role: "system", Content: app.System + " Answer briefly. Follow the explicitly requested language."}, {Role: "user", Content: fmt.Sprintf("%s [case %d]", q.prompt, n)}}, 96, func(s string) error { text += s; return nil })
 			s := sample{Name: q.name, Prompt: q.prompt, Text: text, Input: res.Usage.Input, Output: res.Usage.Output, Seconds: res.Duration.Seconds(), TTFT: res.TTFT.Seconds()}
 			if s.Seconds > 0 {
 				s.Rate = float64(s.Output) / s.Seconds
@@ -102,7 +102,28 @@ func run(endpoint string, runs int) error {
 					language = true
 				}
 			}
-			s.Passed = e == nil && language && text == res.Text && s.Output > 0 && s.TTFT > 0
+			lower := strings.ToLower(text)
+			concept := false
+			if q.arabic {
+				for _, w := range []string{"صلاح", "وصول", "أذون", "اذون"} {
+					if strings.Contains(lower, w) {
+						concept = true
+					}
+				}
+				minimal := false
+				for _, w := range []string{"أقل", "اقل", "الحد الأدنى", "الحد الادني", "ضرور", "مطلوب"} {
+					if strings.Contains(lower, w) {
+						minimal = true
+					}
+				}
+				concept = concept && minimal
+			} else {
+				concept = strings.Contains(lower, "access") && (strings.Contains(lower, "minimum") || strings.Contains(lower, "necessary") || strings.Contains(lower, "required"))
+			}
+			s.Passed = e == nil && language && concept && text == res.Text && s.Output > 0 && s.TTFT > 0
+			if !concept {
+				s.Error = "least-privilege concept rubric missing; requires manual semantic review"
+			}
 			if e != nil {
 				s.Error = e.Error()
 			}
