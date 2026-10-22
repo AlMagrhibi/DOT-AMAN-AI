@@ -34,11 +34,8 @@ func TestReviewIsolationCorrectionDeletion(t *testing.T) {
 	if err != nil || len(x) != 0 {
 		t.Fatal(x, err)
 	}
-	if err = m.Correct(ctx, b, id, "wrong", "user"); err == nil {
-		t.Fatal("cross session")
-	}
-	if err = m.Correct(ctx, a, id, "new fact", "user correction"); err != nil {
-		t.Fatal(err)
+	if err = m.Correct(ctx, b, id, "new fact", "user correction"); err != nil {
+		t.Fatal("shared project correction failed", err)
 	}
 	x, err = m.Recall(ctx, a, "old")
 	if err != nil || len(x) != 0 {
@@ -59,6 +56,9 @@ func TestReviewIsolationCorrectionDeletion(t *testing.T) {
 	x, err = m.Recall(ctx, b, "session-only")
 	if err != nil || len(x) != 0 {
 		t.Fatal("episodic memory leaked across sessions", x, err)
+	}
+	if err = m.Delete(ctx, b, episodicID); err == nil {
+		t.Fatal("episodic memory was deleted across sessions")
 	}
 	if err = m.Delete(ctx, a, id); err != nil {
 		t.Fatal(err)

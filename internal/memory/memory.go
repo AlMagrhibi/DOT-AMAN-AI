@@ -62,11 +62,16 @@ func (m *Memory) Correct(ctx context.Context, session string, id int64, text, so
 	if text == "" || source == "" || len(text) > 16384 {
 		return fmt.Errorf("invalid correction")
 	}
-	r, err := m.DB.ExecContext(ctx, `UPDATE memory SET text=?,source=?,reviewed=1 WHERE session=? AND id=?`, text, source, session, id)
+	// Project memory is intentionally shared across sessions, so an explicit
+	// correction from a new session must be possible. Episodic memory remains
+	// session-scoped and cannot be edited through another session.
+	r, err := m.DB.ExecContext(ctx, `UPDATE memory SET text=?,source=?,reviewed=1 WHERE id=? AND (session=? OR kind='project')`, text, source, id, session)
 	return affected(r, err)
 }
 func (m *Memory) Delete(ctx context.Context, session string, id int64) error {
-	r, err := m.DB.ExecContext(ctx, `DELETE FROM memory WHERE session=? AND id=?`, session, id)
+	// Match Correct: project facts are shared and explicitly deletable from any
+	// session; episodic facts remain isolated.
+	r, err := m.DB.ExecContext(ctx, `DELETE FROM memory WHERE id=? AND (session=? OR kind='project')`, id, session)
 	return affected(r, err)
 }
 func affected(r sql.Result, err error) error {
