@@ -19,4 +19,4 @@ Implemented: strict TOML config; loopback-only inference and SSE; persistent ses
 
 Cloud evidence includes real SQLite, actual `uname`/process cancellation, a real PTY with a clearly labeled local HTTP fixture, live OWASP import, and a real pinned Qwen3‑4B GGUF run. The unchanged synthetic retrieval evaluation is Recall@5 60/60 (100%); this is a narrow lexical fixture benchmark, not broad answer quality. Details: [benchmarks](BENCHMARKS.md), [known issues](KNOWN_ISSUES.md), [implementation report](CODEX_IMPLEMENTATION_REPORT.md).
 
-[Specification](docs/SPECIFICATION.md) · [Architecture](ARCHITECTURE.md) · [Threat model](SECURITY.md) · [Dependencies](DEPENDENCIES.md).
+[Specification](docs/SPECIFICATION.md) · [Architecture](ARCHITECTURE.md) · [Threat model](SECURITY.md) · [Dependencies](DEPENDENCIES.md) · [Comprehensive audit report](DOT_AMAN_AI_COMPREHENSIVE_AUDIT_REPORT.docmd).

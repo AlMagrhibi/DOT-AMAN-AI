@@ -1,0 +1,361 @@
+# تقرير التدقيق والتسليم الشامل — Dot Aman AI
+
+**نوع الملف:** DOCMD، نص Markdown متوافق بامتداد تقرير مستقل
+**تاريخ الإنشاء:** 2026-10-24 UTC
+**المستودع:** https://github.com/AlMagrhibi/DOT-AMAN-AI
+**الفرع:** main
+**Commit المحلي وGitHub:** 36485852b2ddadc53f892130f786e188e325f65d (3648585)
+**حالة الشجرة:** نظيفة، ولا توجد تغييرات محلية غير مرفوعة
+
+هذا الملف هو تقرير موحد قابل للمراجعة. يجمع حالة التنفيذ، الأدلة، المعمارية، الهيكلية، المتطلبات الناقصة، وخطة قبول الجهاز المحلي. المرجع الأساسي هو Aman AI Codex.md المرفق من المستخدم، والنسخة التي يراجعها المستودع هي docs/SPECIFICATION.md. لا يخلط التقرير بين دليل Codex Cloud وقبول CachyOS/Arch على الجهاز النهائي.
+
+## 1. الحكم التنفيذي
+
+المشروع جاهز للبناء والتجربة المحلية. الكود والاختبارات والوثائق موجودة على GitHub في Commit واحد متحقق منه، وتم تشغيل نسخة حقيقية من llama-server ونموذج Qwen3-4B داخل Cloud. التنفيذ السحابي يغطي النواة، SQLite، المعرفة، RAG، الذاكرة، الأدوات المقيدة، TUI/CLI، التقارير والاختبارات الأمنية.
+
+لا يصح إعلان قبول الجهاز النهائي بنسبة 100% قبل تشغيل الاختبارات التي تعتمد على CachyOS/KDE Wayland والعتاد الفعلي. العناصر المتبقية موضحة في القسم 9.
+
+### إنجازات مثبتة
+
+- رأس الفرع المحلي يساوي رأس GitHub مباشرة.
+- 54 اختبار Go ناجح، صفر فشل، صفر تخطٍ.
+- Race وVet وBuild وgofmt وscripts/check.sh وgo mod verify نجحت.
+- govulncheck v1.9.0 أعاد No vulnerabilities found.
+- Qwen3-4B Q4_K_M الحقيقي شُغّل في Cloud بعد تحقق الحجم والبصمة والترخيص.
+- اختبار النموذج الموثق نجح في العربية والإنجليزية وJSON Schema والبث والإلغاء وRAG والجلسات والذاكرة وsystem_info.
+- FTS5/BM25 حقق Recall@5 بمقدار 60/60، وNomic semantic retrieval حقق 12/12 وRecall@5 = 1.0.
+- CISA KEV الحقيقي استورد 1,754 سجلًا واختبر التحديث المشروط وآخر نسخة سليمة.
+- اختبار Offline سجل 61 اتصالًا محليًا و0 اتصال IPv4 خارجي.
+- Fresh clone من GitHub نجح في البناء وcheck.sh وPTY/CLI.
+
+### ما لم يُثبت على الجهاز النهائي
+
+- KDE Wayland وwl-copy وعرض RTL/bidi الحقيقي.
+- اختصار تبديل لوحة المفاتيح Alt+Shift؛ قد يعترضه مدير سطح المكتب أو لا ترسله الطرفية.
+- أداء i5-1145G7 وذاكرة الجهاز.
+- systemd/pacman/journalctl بصلاحيات حقيقية، والمصادقة والإرجاع rollback.
+- عزل الشبكة الخارجي فعليًا على الجهاز.
+- جودة العربية العامة على corpus واسع؛ العينة الصغيرة ناجحة، لكن تشخيصًا أوسع يحتوي صياغة ركيكة.
+
+## 2. منهج التصنيف
+
+- **Complete / Cloud:** تنفيذ واختبار داخل Cloud.
+- **Complete for tested scope:** نجاح حقيقي لكنه محدود بنموذج أو corpus أو عدد عينات.
+- **Target Unverified:** عقد أو تنفيذ موجود، لكن البيئة المطلوبة غير متاحة هنا.
+- **Known limitation:** نطاق مقصود غير منفذ، مثل shell عام أو PDF مصور.
+- **Failed evidence:** اختبار شُغّل وفشل، ويظل محفوظًا كفشل.
+
+الجدول الكامل موجود في REQUIREMENTS_TRACEABILITY.md، ويعاد هنا حتى يكون هذا الملف مستقلًا.
+
+## 3. مصفوفة المتطلبات
+
+| ID | المتطلب والتنفيذ | الدليل | الحالة |
+|---|---|---|---|
+| R-001 | تطوير Cloud ورفع GitHub | شجرة العمل وCommits وorigin | Complete |
+| R-002 | منع الأسرار وDB وlogs وGGUF | .gitignore وgit audit وmodel locks | Complete؛ يعاد عند كل إصدار |
+| R-003 | Go واستدلال وتخزين محليان | go.mod وinternal وSQLite وloopback | Complete؛ تشغيل الجهاز مطلوب |
+| R-004 | llama health/info/complete/stream/cancel/usage | internal/model واختبار Qwen | Complete for tested scope |
+| R-005 | JSON Schema والتحقق قبل الأداة | Suggest وParseSuggestions وregistry parity | Complete for tested scope؛ corpus عدائي أوسع مطلوب |
+| R-006 | ميزانية سياق تحفظ تعليمات الأمان | contextmanager وapp tests | Complete ضمن fallback المحافظ |
+| R-007 | sessions/memory/correction/deletion/export | storage وmemory وCLI/TUI edit/delete | Complete للتخزين المحلي |
+| R-008 | تلخيص هرمي تلقائي مع حفظ الأصل | MaybeCompress وsummary tests | Complete ضمن trigger محدود؛ جودة التلخيص غير مقاسة مستقلًا |
+| R-009 | SourceRegistry وحالة sync والترخيص | knowledge.Source وmigrations | Complete |
+| R-010 | CISA وOWASP وsync يدوي | live CISA وOWASP evidence | Complete للموصلات المنفذة؛ بقية المصادر metadata |
+| R-011 | versions/chunks/provenance/atomic replacement | document_versions وtransactions | Complete |
+| R-012 | FTS5/BM25 عربي/إنجليزي وCVE/CWE | Search وnormalization و60/60 | Complete للنطاق المعجمي |
+| R-013 | embeddings محلية مع البحث النصي | Nomic وchunk_embeddings و12/12 | Complete للـbenchmark المعلن |
+| R-014 | RAG وcitations وno-evidence | app وRAG tests وreal Qwen | Complete لعقد الاسترجاع؛ faithfulness الواسع غير مثبت |
+| R-015 | استيراد النصوص والـsource files | knowledge.Import | Complete للصيغ المعلنة |
+| R-016 | PDF النصي وDOCX | ingest.go واختبارات parser | Complete للنص؛ scanned PDF غير مدعوم |
+| R-017 | المحتوى المستورد والنتائج بيانات غير موثوقة | context/system rules وinjection tests | Complete للعقد المختبر |
+| R-018 | HTTPS allowlist وSSRF وDNS وlast-good | fetchSource وETag وDNS policy | Complete للموصلات؛ network target مطلوب |
+| R-019 | ToolRegistry ثابت وحدود وتدقيق | tools registry/validator/audit | Complete لنطاق registry |
+| R-020 | Analysis/Confirm/Auto وحدود | app config وmode tests | Complete لسير العمل المحلي |
+| R-021 | Arch diagnostics وإصلاح مصرح | diagnostics وservice_restart/package_install | Cloud contract Complete؛ systemd/auth/rollback Target Unverified |
+| R-022 | TUI scroll/Markdown/stream/sessions/shortcuts/cancel | Bubble Tea وPTY fixture | Cloud fixture Complete؛ real PTY وRTL وAlt+Shift Target Unverified |
+| R-023 | tokens/rate/latency/CPU/RAM/GPU/stats | metrics وStats وbenchmarks | Cloud Complete؛ i5 Target Unverified |
+| R-024 | نسخ آخر نتيجة | WaylandClipboard و/copy وmock | Cloud Complete؛ KDE Wayland Target Unverified |
+| R-025 | تقارير عربية MD/JSON مع CVE/CWE/KEV | reporting وcitation-derived findings | Complete؛ القيم غير المتاحة تظل غير متاحة |
+| R-026 | PDF مشروط بخط Unicode | gofpdf وErrPDFUnavailable | Complete كصيغة مشروطة؛ Arabic shaping Target Unverified |
+| R-027 | experiment log | migrations وSaveExperimentDetail | Complete |
+| R-028 | Offline محادثة وذاكرة وRAG وأدوات وتقارير | offline_contract وloopback | Cloud contract Complete؛ العزل الفيزيائي Target Unverified |
+| R-029 | suite للأداء وJSON والأدوات واللغات وRAG/TUI | evaluators وsemantic/CISA/PDF/PTY | Complete للنطاق المعلن؛ corpus وtarget أوسع |
+| R-030 | fuzz/race/build/vet/module/vulnerability | scripts/check وfuzz وgovuln | Complete للكود الحالي؛ يعاد بعد التغيير |
+| R-031 | clean clone وبناء ودليل CachyOS | LOCAL_SETUP وclean-clone-final | Cloud Complete؛ CachyOS نفسه Target Unverified |
+| R-032 | الفصل بين Cloud وtarget وعدم الادعاء | KNOWN_ISSUES وBENCHMARKS وtraceability | Complete توثيقيًا |
+
+لا توجد متطلبات إنتاجية Missing في نطاق Cloud. Remaining هنا تعني قبول target أو قياس جودة أوسع، لا حذف المتطلبات.
+
+## 4. المعمارية
+
+~~~text
+TUI / CLI
+  -> internal/app
+     -> contextmanager + memory + knowledge
+     -> model HTTP على 127.0.0.1:8081
+     -> JSON Schema / ToolRegistry / validator
+     -> bounded executor -> audit -> observations
+     -> SQLite WAL/FTS5
+
+اختياري:
+  llama-server embeddings على 127.0.0.1:8082
+~~~
+
+SQLite يحتفظ بالجلسات والرسائل والذاكرة والتجارب والمصادر والنسخ وسجل التدقيق. واجهة المستخدم لا تملك سياسة التنفيذ. المستندات ونتائج الأدوات ومخرجات النموذج بيانات غير موثوقة ولا تستطيع تسجيل أوامر.
+
+قواعد النقل:
+
+1. inference وembeddings يقبلان numeric loopback فقط.
+2. proxy وredirect للاستدلال معطلان.
+3. source sync نشاط صريح بوجهات ثابتة وHTTPS وحدود حجم وETag/Last-Modified وlast-known-good.
+4. الأدوات mutating محصورة في service_restart وpackage_install مع تحقق وتدقيق؛ لا يوجد arbitrary shell.
+
+## 5. هيكلية المشروع الفعلية
+
+~~~text
+DOT-AMAN-AI/
+├── cmd/
+│   ├── dotamanai-codex/          التطبيق وCLI
+│   ├── dotaman-eval/             تقييم النموذج
+│   ├── dotaman-semantic-eval/    تقييم embeddings
+│   └── dotaman-sync-eval/        تقييم مصادر CISA/OWASP
+├── internal/
+│   ├── app/                      agent loop والحدود
+│   ├── config/                   TOML وloopback policy
+│   ├── contextmanager/           ميزانية السياق
+│   ├── evaluation/               عقود التقييم
+│   ├── knowledge/                ingestion وsearch وembeddings وsync
+│   ├── memory/                   ذاكرة وتلخيص
+│   ├── metrics/                  أداء التطبيق
+│   ├── model/                    HTTP/SSE/Schema/cancel
+│   ├── reporting/                Markdown/JSON/PDF
+│   ├── storage/                  SQLite والمigrations
+│   ├── tools/                    registry وvalidator وaudit
+│   └── tui/                      Bubble Tea وclipboard
+├── configs/                      example وmodel locks
+├── scripts/                      build/download/start/check
+├── tests/                        PTY وoffline وreal-model
+├── testdata/                     evaluation وsemantic fixtures
+├── docs/SPECIFICATION.md         المواصفة المراجعة
+├── docs/validation/              أدلة JSON وgovuln
+├── .github/workflows/check.yml  CI configuration
+└── الوثائق الرئيسية             README وARCHITECTURE وSECURITY
+                                 DEPENDENCIES وPROJECT_MAP
+                                 REQUIREMENTS_TRACEABILITY وBENCHMARKS
+                                 KNOWN_ISSUES وLOCAL_SETUP
+                                 CODEX_IMPLEMENTATION_REPORT
+~~~
+
+ملفات bin/ وبيانات التشغيل المحلية ليست جزءًا من التسليم العام. لا توجد أوزان GGUF أو قواعد بيانات مستخدم أو أسرار في Git.
+
+## 6. تفاصيل التنفيذ
+
+### النواة والتخزين
+
+إعداد TOML صارم، data_dir/root مطلقان، SQLite WAL/FTS5، migrations ومعاملات، sessions ورسائل أصلية، restart، edit/delete، project memory مشتركة بعد review، وepisodic memory معزولة.
+
+### النموذج
+
+HTTP provider إلى llama-server، health وmodel info وcomplete وSSE وcancel وusage، JSON Schema مرتب، حدود context/output/time، واستدلال loopback فقط.
+
+### المعرفة
+
+FTS5/BM25 وتطبيع عربي، Nomic embeddings محلية، hybrid ranker، citations وSHA-256 وdocument versions، TXT/MD/JSON/CSV/LOG/TOML/Go/Shell، PDF نصي وDOCX، CISA وOWASP، وتحديث ذري مع fallback.
+
+### الذاكرة والسياق
+
+تلخيص bounded تلقائي، مستويان مع ranges أصلية، إبطال بعد edit/delete، استرجاع بعد restart، وخطأ صريح عند تجاوز تعليمات الأمان.
+
+### الأدوات
+
+Analysis/Confirm/Auto، max steps/runtime/retries، schemas، time/output bounds، process-group cancellation، audit fail-closed، diagnostics، service_restart وpackage_install فقط.
+
+### TUI/CLI
+
+Bubble Tea v1، Markdown، streaming، resize، scroll، sessions، Ctrl+C للإلغاء، Ctrl+Q للخروج، /stats و/copy و/export وmemory/search/import/edit/delete. لا يوجد تحكم مضمون في layout نظام التشغيل عبر Alt+Shift.
+
+### التقارير
+
+Arabic Markdown وlegacy JSON وstructured security JSON، findings من citations، وPDF اختياري مع Unicode TrueType. PDF المصور غير مدعوم، وغياب الخط ينتج ErrPDFUnavailable بدل ملف عربي مكسور.
+
+## 7. الأدلة والقياسات
+
+### بوابات الجودة
+
+| البوابة | النتيجة |
+|---|---|
+| go test -tags sqlite_fts5 -count=1 ./... | 54 pass، 0 fail، 0 skip |
+| go test -race -tags sqlite_fts5 -count=1 ./... | Passed |
+| go vet -tags sqlite_fts5 ./... | Passed |
+| gofmt وscripts/check.sh | Passed |
+| go build وtagged build | Passed |
+| go mod verify | Passed |
+| govulncheck v1.9.0 | No vulnerabilities found |
+| FuzzArguments | 68,773 حالة في run مسجل |
+| FuzzSuggestions | 101,298 حالة في run مسجل |
+| FuzzNormalize | 105,511 حالة في run مسجل |
+
+Fuzz bounded evidence وليست إثباتًا شاملاً.
+
+### نموذج Qwen3-4B
+
+- repository: Qwen/Qwen3-4B-GGUF
+- revision: bc640142c66e1fdd12af0bd68f40445458f3869b
+- filename: Qwen3-4B-Q4_K_M.gguf
+- size: 2,497,280,256 bytes
+- SHA-256: 7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5
+- license: Apache-2.0
+- llama.cpp: c7fc5094179bf8a9c73c18593db714f8da41a402
+- weights: خارج Git
+
+الدليل الناجح real-model-4b-final.json وreal-model-4b-postboundary.json مرر العربية والإنجليزية و6/6 Schema في التقرير النهائي، streaming cancellation، RAG citation، restart، memory recall، وsystem_info.
+
+قياس Cloud الناجح postboundary:
+
+- p50 = 5.772 ثانية
+- p95 = 7.621 ثانية
+- end-to-end = 7.914 tok/s
+- sampled server peak RSS = 5,258,907,648 bytes
+- average CPU = 388% من نواة واحدة
+- context = 4096، threads = 4، GPU = N/A
+
+هذه الأرقام لا تمثل جهاز المستخدم.
+
+### فشل محفوظ
+
+real-model-4b-toolsafe-failed.json يسجل إعادة تحقق على مضيف Cloud أبطأ: warmup وstream cancellation نجحا، لكن JSON Schema تجاوز مهلة headers، وفشلت الاختبارات التابعة. لم يُستبدل هذا الفشل بنجاح زائف.
+
+### Bench
+
+- AMD EPYC Cloud: prompt 42.23 tok/s، generation 14.04 tok/s.
+- Intel Xeon Platinum Cloud لاحق: prompt 9.12 tok/s، generation 0.64 tok/s.
+- اختلاف المضيفين يؤكد أن هذه ليست مواصفة لجهاز i5.
+
+### Retrieval وCISA وOffline
+
+- lexical: 20 وثيقة و60 query، Recall@5 = 60/60، citation provenance = 1.0.
+- semantic: 10 وثائق و12 query، Recall@5 = 1.0، Arabic 2/2، mean latency 32.62 ms.
+- CISA: 1,754 record، first sync ok، second conditional not-modified، CVE search passed.
+- offline: 61 connects، 0 remote IPv4.
+- PTY/CLI: chat، restart/export، edit/delete، import/search عربي، stream/resize، stats/quit passed باستخدام local HTTP fixture.
+- real Wayland clipboard: unrun.
+- clean clone: go mod verify وcheck.sh وtagged build وPTY/CLI passed.
+
+### Arch
+
+حاوية archlinux:base أثبتت pacman 7.1 وsystemd/journalctl 262 وip/ps/df. لم تُشغّل systemd PID 1، ولم تُنفذ إصلاحات privileged، وليست CachyOS أو KDE.
+
+## 8. العربية والإنجليزية
+
+اختبار Qwen الصغير نجح في مخرجات عربية وإنجليزية ومصطلحات least privilege. لكن docs/validation/arabic-diagnosis.json يحتوي صياغات غير طبيعية مثل «القليل من الامتياز» و«الحقول الأدنى». لذلك:
+
+1. النموذج يعمل بالعربية في العينة المعلنة.
+2. جودة العربية العامة غير مثبتة.
+3. يجب فصل جودة النموذج عن عرض RTL.
+4. يلزم corpus عربي أوسع وتقييم دلالي/بشري.
+5. validators وcitations تظل إلزامية حتى لو كانت الصياغة ضعيفة.
+
+## 9. العمل المتبقي للقبول المحلي
+
+### تشغيل النموذج
+
+بناء llama.cpp عند commit المحدد، تنزيل GGUF من publisher URL المحدد، فحص الحجم والبصمة والترخيص، تشغيله على 127.0.0.1:8081، ثم تشغيل doctor وchat. embedding server على 127.0.0.1:8082 اختياري.
+
+### TUI وWayland
+
+اختبار Arabic/English/mixed code، RTL/bidi، resize، scroll، stream cancellation، Ctrl+C، Ctrl+Q، /copy بـwl-copy، وAlt+Shift على KDE. إذا كان Alt+Shift مختصرًا خاصًا بسطح المكتب، يجب توثيق ذلك بدل نسبته للتطبيق.
+
+### Arch/CachyOS
+
+اختبار systemctl وjournalctl وpacman في systemd حقيقي، confirm/approval للإجراءات، المصادقة والrollback، مع عدم تنفيذ تغيير قبل موافقة المستخدم.
+
+### الأداء
+
+قياس TTFT وp50 وp95 وtok/s وpeak RSS وCPU عند context 2048 و4096 على i5-1145G7. لا تُقارن مباشرة بأرقام Cloud ولا تملأ GPU بقيمة افتراضية.
+
+### Offline
+
+قطع الإنترنت الخارجي مع إبقاء loopback، اختبار chat/sessions/memory/RAG/tools/reports، وإثبات الاتصالات دون رفع بيانات خاصة.
+
+### PDF
+
+تثبيت Unicode TTF، تصدير PDF، وفحص shaping/RTL بصريًا في viewer المحلي؛ وجود توقيع PDF وحده غير كافٍ.
+
+## 10. خطة التنفيذ اللاحقة
+
+1. **تجهيز:** clone، check، build، llama.cpp، GGUF، doctor.
+2. **لغة:** عربي، إنجليزي، mixed code، وتسجيل الجودة.
+3. **وظائف:** import، FTS، embeddings، restart، memory، RAG، tools، export.
+4. **واجهة:** stream، cancel، resize، RTL، wl-copy، Alt+Shift.
+5. **نظام وأداء:** systemd/pacman، benchmark، offline isolation.
+6. **إغلاق:** إصلاح الفشل، تحديث docs، إعادة race/fuzz/govuln، Commit/Push، وتحديث هذا التقرير.
+
+## 11. أوامر التشغيل المحلي
+
+~~~sh
+sudo pacman -S --needed go base-devel git cmake ninja curl
+git clone https://github.com/AlMagrhibi/DOT-AMAN-AI.git
+cd DOT-AMAN-AI
+./scripts/check.sh
+mkdir -p bin
+go build -tags sqlite_fts5 -trimpath -o bin/dotamanai-codex ./cmd/dotamanai-codex
+
+./scripts/build-llama.sh "$HOME/.cache/dotamanai-codex/llama.cpp"
+export LLAMA_SERVER="$HOME/.cache/dotamanai-codex/llama.cpp/build/bin/llama-server"
+export MODEL_PATH="$HOME/.local/share/dotamanai-codex/models/Qwen3-4B-Q4_K_M.gguf"
+./scripts/start-model.sh
+curl --noproxy '*' --fail http://127.0.0.1:8081/health
+bin/dotamanai-codex doctor
+bin/dotamanai-codex
+~~~
+
+التنزيل ليس تلقائيًا. لا ترفع GGUF أو قواعد البيانات أو logs أو أسرارًا إلى Git. تفاصيل paths وembedding وreports موجودة في LOCAL_SETUP.md.
+
+## 12. الأمن والاعتماديات
+
+- Go 1.27.3، CGO وbundled SQLite، tag sqlite_fts5.
+- Bubble Tea v1.3.10 وBubbles وGlamour وLip Gloss.
+- PDF عبر ledongthuc/pdf وgofpdf مع خط يحدده المستخدم محليًا.
+- لا يوجد cloud AI SDK أو telemetry.
+- الأدوات validated وbounded وaudited، والمدخلات غير الصالحة لا تصل للمنفذ.
+- source sync يثبت الوجهات ويمنع private/loopback DNS عند direct egress.
+- go.sum وgo mod verify وgovulncheck موثقة.
+- ترخيص التطبيق الجديد نفسه لم يُحسم بعد؛ Public visibility لا تمنح ترخيصًا تلقائيًا.
+
+## 13. حالة GitHub
+
+~~~text
+LOCAL HEAD  36485852b2ddadc53f892130f786e188e325f65d
+GITHUB main 36485852b2ddadc53f892130f786e188e325f65d
+WORKTREE    clean
+SYNC        OK
+~~~
+
+## 14. فهرس الأدلة
+
+- PROJECT_MAP.md: المراحل 0 إلى 11.
+- REQUIREMENTS_TRACEABILITY.md: المصفوفة الأصلية.
+- CODEX_IMPLEMENTATION_REPORT.md: التقرير المرحلي.
+- BENCHMARKS.md: القياس والاسترجاع.
+- KNOWN_ISSUES.md: القيود والفشل المحفوظ.
+- LOCAL_SETUP.md: CachyOS/Arch.
+- ARCHITECTURE.md وSECURITY.md وDEPENDENCIES.md.
+- docs/SPECIFICATION.md: نسخة المواصفة.
+- docs/validation/quality.json: Go/race/govuln.
+- docs/validation/real-model-4b-final.json وreal-model-4b-postboundary.json: Qwen الناجح.
+- docs/validation/real-model-4b-toolsafe-failed.json: إعادة التحقق الفاشلة.
+- docs/validation/llama-bench-4b.json وllama-bench-4b-current-host.json: قياسات Cloud.
+- docs/validation/semantic-real-postboundary.json: embeddings.
+- docs/validation/cisa-real-sourceregistry.json: CISA.
+- docs/validation/offline-contract.json: Offline.
+- docs/validation/pty-cli.json: PTY/CLI.
+- docs/validation/clean-clone-final.json: fresh clone.
+- docs/validation/arch-container.json: Arch availability.
+- docs/validation/arabic-diagnosis.json: تشخيص جودة العربية.
+- docs/validation/govulncheck.txt: سجل الثغرات.
+
+## 15. خلاصة قابلة للإرسال
+
+Dot Aman AI في Commit 3648585 مشروع Go محلي قابل للبناء والتجربة، مع تنفيذ Cloud موثق لمعظم الوظائف البرمجية المطلوبة. نجح Qwen3-4B الحقيقي ضمن عينة محددة، ونجح RAG الهجين والذاكرة وCISA وOffline وPTY/CLI وRace/Fuzz/Vet/Build/govulncheck ضمن حدودها. لم تُرفع أوزان أو أسرار أو قواعد بيانات.
+
+القبول النهائي على جهاز المستخدم مشروط بتجربة CachyOS/KDE Wayland: RTL العربية، wl-copy، Alt+Shift، systemd/pacman/journalctl والـapproval، أداء i5-1145G7، PDF العربي، وعزل الإنترنت الفيزيائي. جودة العربية العامة تحتاج corpus أوسع. لا تُحوّل هذه البنود إلى PASS إلا بعد حفظ دليل تشغيل فعلي لها.

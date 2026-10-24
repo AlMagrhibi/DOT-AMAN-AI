@@ -17,7 +17,7 @@ States describe implemented scope, not an unconditional product acceptance claim
 | 10 Hardening | Complete for Cloud scope | gofmt/vet/build, unit/integration/race, bounded fuzz, module integrity and govulncheck v1.9.0 all passed; real 4B evaluator passed its declared smoke set |
 | 11 Handoff | Complete for Cloud delivery | Local setup, pinned build/start/download scripts, traceability/report/benchmark documents, fresh-clone evidence at `27c0c0a`, and continuously pushed source; final target acceptance remains explicitly separate |
 
-Validation evidence: `docs/validation/quality.json`, `retrieval.json`, `pty-cli.json`, `live-owasp.json`. See KNOWN_ISSUES.md for limitations, BENCHMARKS.md for metrics, and CODEX_IMPLEMENTATION_REPORT.md for delivery status. “Complete for Cloud implementation” describes production code plus Cloud evidence; it does not claim target-device execution.
+Validation evidence: `docs/validation/quality.json`, `retrieval.json`, `pty-cli.json`, `live-owasp.json`. See KNOWN_ISSUES.md for limitations, BENCHMARKS.md for metrics, CODEX_IMPLEMENTATION_REPORT.md for delivery status, and `DOT_AMAN_AI_COMPREHENSIVE_AUDIT_REPORT.docmd` for the single-file audited handoff. “Complete for Cloud implementation” describes production code plus Cloud evidence; it does not claim target-device execution.
 
 ## Current evidence
 
