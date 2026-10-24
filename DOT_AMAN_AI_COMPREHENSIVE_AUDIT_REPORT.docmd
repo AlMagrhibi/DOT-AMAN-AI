@@ -4,8 +4,8 @@
 **تاريخ الإنشاء:** 2026-10-24 UTC
 **المستودع:** https://github.com/AlMagrhibi/DOT-AMAN-AI
 **الفرع:** main
-**Commit المحلي وGitHub:** 36485852b2ddadc53f892130f786e188e325f65d (3648585)
-**حالة الشجرة:** نظيفة، ولا توجد تغييرات محلية غير مرفوعة
+**Commit الأساس الذي جرى تدقيقه قبل إضافة هذا التقرير:** 36485852b2ddadc53f892130f786e188e325f65d (3648585)
+**حالة الشجرة عند الإغلاق:** نظيفة؛ رأس التقرير النهائي يُتحقق بأمر git rev-parse HEAD وبالقراءة المباشرة من GitHub
 
 هذا الملف هو تقرير موحد قابل للمراجعة. يجمع حالة التنفيذ، الأدلة، المعمارية، الهيكلية، المتطلبات الناقصة، وخطة قبول الجهاز المحلي. المرجع الأساسي هو Aman AI Codex.md المرفق من المستخدم، والنسخة التي يراجعها المستودع هي docs/SPECIFICATION.md. لا يخلط التقرير بين دليل Codex Cloud وقبول CachyOS/Arch على الجهاز النهائي.
 
@@ -325,10 +325,10 @@ bin/dotamanai-codex
 ## 13. حالة GitHub
 
 ~~~text
-LOCAL HEAD  36485852b2ddadc53f892130f786e188e325f65d
-GITHUB main 36485852b2ddadc53f892130f786e188e325f65d
-WORKTREE    clean
-SYNC        OK
+BASELINE    36485852b2ddadc53f892130f786e188e325f65d
+REPORT HEAD  يُتحقق به من git rev-parse HEAD وبـgit ls-remote origin refs/heads/main
+WORKTREE    clean بعد الرفع
+SYNC        OK عند آخر تحقق؛ لا يكرر الملف بصمته الذاتية
 ~~~
 
 ## 14. فهرس الأدلة
